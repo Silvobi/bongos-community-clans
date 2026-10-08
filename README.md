@@ -18,28 +18,6 @@ Mod serwerowy Fabric dla **Minecraft Java 26.3**. Działa z klientem vanilla; gr
 - Umieść `BongosCommunityClans-1.0.3.jar` w `mods/`, usuń poprzedni JAR tego moda i uruchom ponownie serwer. Zwykłe `/reload` nie ładuje modów.
 - Na wskazanym serwerze testowym Fabric API jest już zainstalowane.
 
-## Kot i resourcepack
-
-Zaakceptuj opcjonalną paczkę zasobów (około 4,76 MB) podczas łączenia z serwerem, przed wejściem do świata. Etap konfiguracji czeka na pełne załadowanie paczki, a następnie wpuszcza gracza do świata. Zależnie od ustawień klienta paczka może zostać zaakceptowana automatycznie. Samo dołączenie nie uruchamia kota.
-
-W świecie wpisz `/clan cat`. Nie trzeba należeć do klanu ani mieć uprawnień operatora. Komenda korzysta z już załadowanej paczki i nie otwiera pytania o jej pobranie. Odmowa lub błąd pobrania nadal pozwala wejść do świata; komenda wtedy wyświetla informację o ponownym dołączeniu i zaakceptowaniu paczki. Stan załadowania jest związany z konkretnym połączeniem, nie przechodzi na kolejną sesję gracza.
-
-Kot pojawia się 1,35 bloku przed graczem, na wysokości nóg, w miejscu wywołania. Płaski obraz obraca się pionowo w stronę kamery. Animacja ma 256 × 320 px, 137 klatek, 20 FPS i trwa 6,85 s. Audio rozpoczyna się razem z pierwszą klatką. Kot i audio trafiają tylko do osoby wywołującej komendę. Ponowne wywołanie zastępuje poprzednie. Efekt znika po zakończeniu, śmierci lub zmianie wymiaru; nie powstaje żaden przedmiot w świecie ani w ekwipunku. Przy opóźnieniach serwera pomijane są spóźnione klatki, aby nie rozciągać obrazu względem audio.
-
-Paczka jest zawarta w JAR. Mod uruchamia jej mały host HTTP podczas konfiguracji pierwszego połączenia; nie trzeba instalować dodatkowego moda. Ustawienia powstają w `config/bongo-community-clans-cat.properties`. Domyślnie HTTP działa na `127.0.0.1`, na porcie serwera + 1 (testowy serwer: 25566). Ten adres obsługuje klienta uruchomionego na tym samym komputerze. Dla innych komputerów ustaw `http.bind` na odpowiedni adres nasłuchiwania i `pack.url` na osiągalny dla nich bezpośredni URL paczki. Można też hostować dołączony ZIP zewnętrznie i ustawić `http.enabled=false`. Zmiany konfiguracji wymagają restartu.
-
-## Automatyczny kot w 1.0.3
-
-W survivalu i adventure mod wykrywa Shift+kliknięcie zajętego slotu w GUI informacji klanu oraz zamknięcie tego samego okna pakietem klienta w ciągu 500 ms. Dotyczy zarówno próby zabrania dekoracji z GUI, jak i wrzucenia własnego przedmiotu do GUI. Kot uruchamia się po zamknięciu, wyłącznie dla tej osoby, z audio. W sesji gracza obowiązuje 30-sekundowy cooldown automatycznych wywołań. Aktywna animacja nie jest przerywana kolejnym gestem. Ręczne `/clan cat` pozostaje dostępne niezależnie od cooldownu.
-
-Zwykłe kliknięcie, Shift+kliknięcie pustego slotu, powolne zamknięcie, kliknięcie zwykłe pomiędzy Shift+kliknięciem a zamknięciem, niezgodny identyfikator okna i inne rodzaje menu nie uruchamiają efektu. Zamknięcia wywołane przez serwer, nawigacja stron i ponowne otwieranie GUI nie są traktowane jak pakiet zamknięcia klienta. Creative i spectator nie wywołują automatycznego kota. Bez załadowanej paczki automatyczny efekt jest pomijany bez wiadomości i bez nowego pytania o zasoby.
-
-To reakcja na konkretną sekwencję wejścia, bez kar i ingerencji w przedmioty. Obsługa ekwipunku pozostaje taka jak w 1.0.0. Odstęp jest liczony między obsługą kliknięcia i zamknięcia na serwerze; opóźnienia sieci/serwera mogą wpływać na rozpoznanie gestu.
-
-Testy: 10 testów jednostkowych oraz klienci vanilla na osobnym serwerze z tym samym zestawem modów. Sprawdzono ofertę paczki w protokole konfiguracji przed wejściem do świata, tekst PL/EN, oczekiwanie na SUCCESSFULLY_LOADED (sama akceptacja i pobranie nie wpuszcza do świata), SHA-1 ZIP, brak automatycznej animacji przy dołączeniu, odmowę/błąd pobrania, ponowne połączenie, uruchomienie komendą bez nowego pytania, klatki 0–136, audio, zakończenie, prywatność i zastępowanie animacji. Wygląd kota został oceniony przez użytkownika w wersji 1.0.1; zasoby, geometria i odtwarzanie w 1.0.2 pozostają takie same.
-
-Testy 1.0.3: rzeczywiste pakiety survivalowego GUI, oba kierunki Shift+kliknięcia, zachowanie dekoracji i własnych przedmiotów/liczby sztuk, negatywne gesty, prywatność audio/obrazu, cały 30-sekundowy cooldown i jego wygaśnięcie, ręczna komenda w trakcie cooldownu oraz klient bez paczki. Uruchomienie: `gradlew.bat guiPrankIntegrationTest` na izolowanym serwerze. Osobny test własnego przedmiotu: `gradlew.bat guiInventoryIntegrationTest -PtestPlayer=<nick>`; po komunikacie READY użyj `give <nick> minecraft:stone 8` w konsoli izolowanego serwera.
-
 Paczka jest budowana z przetworzonych zasobów przez `tools/build-cat-pack.py`; nie używa animowanej tekstury z globalną fazą. Każda klatka ma osobny model wybierany przez serwer.
 
 ## Pierwszy klan
