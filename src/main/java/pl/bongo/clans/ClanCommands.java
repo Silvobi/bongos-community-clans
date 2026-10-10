@@ -17,7 +17,7 @@ public final class ClanCommands {
     @FunctionalInterface private interface Action { void run(ClanRuntime runtime, ServerPlayer player); }
     private static int run(CommandContext<CommandSourceStack> ctx, Action action) {
         ServerPlayer p = ctx.getSource().getPlayer();
-        if (p == null) { ctx.getSource().sendFailure(Component.literal("This command is available to players. / Ta komenda jest dostępna dla graczy.")); return 0; }
+        if (p == null) { ctx.getSource().sendFailure(Component.literal(Lang.text((String) null, "player_only"))); return 0; }
         if (CommunityClans.runtime == null) { p.sendSystemMessage(Lang.component(p, "unavailable")); return 0; }
         try { action.run(CommunityClans.runtime, p); return 1; }
         catch (ClanException e) { CommunityClans.runtime.tell(p, e.key); return 0; }

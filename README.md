@@ -1,4 +1,4 @@
-# Bongo's Community Clans — 1.0.3
+# Bongo's Community Clans — 1.0.4
 
 
 ## Autorstwo AI / AI disclosure
@@ -15,7 +15,7 @@ Mod serwerowy Fabric dla **Minecraft Java 26.3**. Działa z klientem vanilla; gr
 
 - Minecraft Java 26.3, Java 25, Fabric Loader 0.19.5 lub nowszy zgodny z 26.3.
 - Fabric API 0.161.0+26.3.
-- Umieść `BongosCommunityClans-1.0.3.jar` w `mods/`, usuń poprzedni JAR tego moda i uruchom ponownie serwer. Zwykłe `/reload` nie ładuje modów.
+- Umieść `BongosCommunityClans-1.0.4.jar` w `mods/`, usuń poprzedni JAR tego moda i uruchom ponownie serwer. Zwykłe `/reload` nie ładuje modów.
 - Na wskazanym serwerze testowym Fabric API jest już zainstalowane.
 
 Paczka jest budowana z przetworzonych zasobów przez `tools/build-cat-pack.py`; nie używa animowanej tekstury z globalną fazą. Każda klatka ma osobny model wybierany przez serwer.
@@ -81,7 +81,7 @@ Quickchat jest ustawieniem gracza, zapisywanym między sesjami. Po włączeniu `
 
 Gracz może należeć do jednego klanu i mieć jedno aktywne zaproszenie. Zaproszenie wygasa po 5 minutach, także podczas wyłączenia serwera. Utrata uprawnień lub odejście zapraszającego unieważnia jego zaproszenia. Ustawienie ignorowania zaproszeń jest trwałe.
 
-Komunikaty, okno usunięcia i GUI są renderowane przez serwer w języku danego klienta: `pl_*` → polski, pozostałe → angielski. Zmiana języka w ustawieniach klienta dotyczy kolejnych komunikatów i ponownie otwartego GUI. Teksty użytkowników i nazwy klanów nie są tłumaczone.
+Komunikaty, okno usunięcia i GUI są renderowane przez serwer w języku danego klienta: `pl_*` → polski, pozostałe → angielski. Zmiana języka w ustawieniach klienta dotyczy kolejnych komunikatów i ponownie otwartego GUI. Teksty użytkowników i nazwy klanów nie są tłumaczone. Konsola, która nie ma języka klienta, otrzymuje angielski komunikat ograniczenia komend do graczy.
 
 ## Okna i zapis
 

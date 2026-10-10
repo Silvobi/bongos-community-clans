@@ -107,5 +107,15 @@ class ClanServiceTest {
         assertEquals("pl",Lang.language("pl_pl")); assertEquals("en",Lang.language("de_de"));
         assertEquals("Founder",Lang.text("en_us","role_founder"));
         assertEquals("Założyciel",Lang.text("pl_pl","role_founder"));
+        assertEquals("pl",Lang.language("PL_pl"));
+        assertEquals("en",Lang.language(null));
+        assertEquals("This command is available to players.",Lang.text((String)null,"player_only"));
+        for (String key : Lang.keys("en")) {
+            // Both catalogs use %s. Extra arguments also cover keys without placeholders.
+            String[] args = java.util.Collections.nCopies(8,"VALUE").toArray(String[]::new);
+            String pl = Lang.text("pl_pl",key,(Object[])args), en = Lang.text("en_us",key,(Object[])args);
+            assertFalse(pl.isBlank(),key); assertFalse(en.isBlank(),key);
+            assertEquals(pl.split("VALUE",-1).length,en.split("VALUE",-1).length,key);
+        }
     }
 }
