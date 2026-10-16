@@ -61,13 +61,13 @@ public final class ClanCommands {
                 .executes(c -> run(c, (r,p) -> {
                     String[] parts=createArguments(str(c,"name_tag"));
                     r.service.create(p.getUUID(), p.getGameProfile().name(), parts[0],parts[1]);
-                    Clan clan = r.service.require(p.getUUID()); r.tell(p,"created",clan.name,CommunityClans.tag(clan)); r.refreshDisplay();
+                    Clan clan = r.service.require(p.getUUID()); r.tell(p,"created",clan.name,CommunityClans.bracketedTag(clan)); r.refreshDisplay();
                 }))));
         root.then(literal("invite").requires(s -> hasPower(s,1)).then(username(true).executes(c -> run(c,(r,p) -> {
             ServerPlayer target = r.server.getPlayerList().getPlayerByName(str(c,"username"));
             if (target == null) throw new ClanException("player_offline");
             r.service.invite(p.getUUID(),target.getUUID()); Clan clan = r.service.require(p.getUUID());
-            r.tell(p,"invited",target.getGameProfile().name()); r.tell(target,"invitation",p.getGameProfile().name(),clan.name,CommunityClans.tag(clan));
+            r.tell(p,"invited",target.getGameProfile().name()); r.tell(target,"invitation",p.getGameProfile().name(),clan.name,CommunityClans.bracketedTag(clan));
         }))));
         root.then(literal("accept").executes(c -> run(c,(r,p) -> {
             r.service.accept(p.getUUID(),p.getGameProfile().name()); r.broadcast(r.service.require(p.getUUID()),"accepted",p.getGameProfile().name()); r.refreshDisplay();
@@ -104,7 +104,7 @@ public final class ClanCommands {
                 .then(argument("value",StringArgumentType.greedyString())
                 .executes(c -> run(c,(r,p) -> {
                     r.service.change(p.getUUID(),field,textArgument(str(c,"value"))); Clan clan = r.service.require(p.getUUID());
-                    Object value = field.equals("name") ? clan.name : CommunityClans.tag(clan);
+                    Object value = field.equals("name") ? clan.name : CommunityClans.bracketedTag(clan);
                     r.broadcast(clan,"changed_" + field,value); r.refreshDisplay();
                 }))));
         root.then(change);

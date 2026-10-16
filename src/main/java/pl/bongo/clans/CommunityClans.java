@@ -45,7 +45,7 @@ public final class CommunityClans implements ModInitializer {
                 if (invite != null && invite.expiresAt > System.currentTimeMillis()) {
                     var clan = runtime.service.state().clans.get(invite.clan);
                     if (clan != null && clan.members.containsKey(invite.inviter))
-                        runtime.tell(handler.player, "invitation", clan.members.get(invite.inviter).name, clan.name, tag(clan));
+                        runtime.tell(handler.player, "invitation", clan.members.get(invite.inviter).name, clan.name, bracketedTag(clan));
                 }
             } catch (RuntimeException e) { LOGGER.error("Could not update joining player's clan data", e); }
         });
@@ -67,8 +67,10 @@ public final class CommunityClans implements ModInitializer {
         });
     }
     public static MutableComponent prefix(ClanData.Clan clan) {
-        return Component.literal("[").withStyle(Style.EMPTY.withColor(TextColor.fromRgb(clan.color)))
-                .append(tag(clan)).append(Component.literal("] "));
+        return bracketedTag(clan).append(" ");
+    }
+    public static MutableComponent bracketedTag(ClanData.Clan clan) {
+        return Component.literal("[").withStyle(ChatFormatting.DARK_GRAY).append(tag(clan)).append("]");
     }
     public static MutableComponent tag(ClanData.Clan clan) { return ClanTag.component(clan.tag, clan.color); }
     public static MutableComponent displayName(ClanData.Clan clan, String name) {

@@ -45,20 +45,20 @@ class ClanTagTest {
         ClanData.Clan clan=new ClanData.Clan(); clan.tag="&1Super&4Clan";
         Component name=CommunityClans.displayName(clan,"Player");
         assertEquals("[SuperClan] Player",name.getString());
-        assertEquals(List.of(new Run("[",0xFFFFFF),new Run("Super",0x0000AA),new Run("Clan",0xAA0000),
-                new Run("] ",0xFFFFFF),new Run("Player",0xFFFFFF)),runs(name));
+        assertEquals(List.of(new Run("[",0x555555),new Run("Super",0x0000AA),new Run("Clan",0xAA0000),
+                new Run("]",0x555555),new Run(" ",0x555555),new Run("Player",0xFFFFFF)),runs(name));
     }
-    @Test void savedSingleColorPrefixesKeepTheirAppearance() {
+    @Test void savedSingleColorTagsUseDarkGrayBrackets() {
         ClanData.Clan clan=new ClanData.Clan(); clan.tag="Old"; clan.color=0x123456;
-        assertEquals(List.of(new Run("[",0x123456),new Run("Old",0x123456),new Run("] ",0x123456),
+        assertEquals(List.of(new Run("[",0x555555),new Run("Old",0x123456),new Run("]",0x555555),new Run(" ",0x555555),
                 new Run("Player",0xFFFFFF)),runs(CommunityClans.displayName(clan,"Player")));
     }
     @Test void translatedMessagesPreserveTagColorsAndResetAfterTheArgument() {
         ClanData.Clan clan=new ClanData.Clan(); clan.tag="&1Super&4Clan";
-        Component tag=CommunityClans.tag(clan);
+        Component tag=CommunityClans.bracketedTag(clan);
         assertEquals("Tag klanu został zmieniony na [SuperClan].",Lang.component("pl_pl","changed_tag",tag).getString());
-        assertEquals(List.of(new Run("Clan tag changed to [",0xFFFFFF),new Run("Super",0x0000AA),
-                new Run("Clan",0xAA0000),new Run("].",0xFFFFFF)),runs(Lang.component("en_us","changed_tag",tag)));
+        assertEquals(List.of(new Run("Clan tag changed to ",0xFFFFFF),new Run("[",0x555555),new Run("Super",0x0000AA),
+                new Run("Clan",0xAA0000),new Run("]",0x555555),new Run(".",0xFFFFFF)),runs(Lang.component("en_us","changed_tag",tag)));
         assertEquals("Members: 4",Lang.component("en_us","info_members",4).getString());
         assertTrue(Lang.component("en_us","invitation","Player","MyClan",tag).getString().contains("MyClan [SuperClan]"));
     }

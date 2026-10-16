@@ -28,7 +28,7 @@ Paczka jest budowana z przetworzonych zasobów przez `tools/build-cat-pack.py`; 
 /clan invite Kolega
 ```
 
-Zaproszony gracz wpisuje `/clan accept`. Przed nickiem pojawi się `[MasloTeamX] Nick` na czacie, w TAB i w nametagu nad głową. Kody kolorów wpisuje się bezpośrednio w tagu; każdy fragment może mieć inny kolor. Nick i nawiasy pozostają białe.
+Zaproszony gracz wpisuje `/clan accept`. Przed nickiem pojawi się `[MasloTeamX] Nick` na czacie, w TAB i w nametagu nad głową. Kody kolorów wpisuje się bezpośrednio w tagu; każdy fragment może mieć inny kolor. Nawiasy kwadratowe wokół tagu mają zawsze kolor `&8` (ciemnoszary); nick pozostaje biały.
 
 ## Komendy
 

@@ -36,7 +36,7 @@ public final class ClanInfoMenu extends ChestMenu {
         container.setItem(4,item(Items.NAME_TAG,Lang.text(viewer,"info_name",clan.name),List.of()));
         container.getItem(4).set(DataComponents.CUSTOM_NAME,CommunityClans.prefix(clan));
         container.getItem(4).set(DataComponents.LORE,new ItemLore(List.of(
-                Lang.component(viewer,"info_name",clan.name),Lang.component(viewer,"info_tag",CommunityClans.tag(clan)),
+                Lang.component(viewer,"info_name",clan.name),Lang.component(viewer,"info_tag",CommunityClans.bracketedTag(clan)),
                 Lang.component(viewer,"info_date",date),Lang.component(viewer,"info_founder",clan.founder().name),
                 Lang.component(viewer,"info_members",clan.members.size())).stream()
                 .<Component>map(c -> c.copy().withStyle(ChatFormatting.GRAY)).toList()));
