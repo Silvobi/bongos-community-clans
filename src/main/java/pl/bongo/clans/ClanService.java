@@ -98,8 +98,7 @@ public final class ClanService {
             Clan c = require(s, actor); permission(c, actor, 2);
             switch (field) {
                 case "name" -> { String n = ClanData.name(value); unique(s, c.id, n, c.tag); c.name = n; }
-                case "tag" -> { String t = ClanData.tag(value); unique(s, c.id, c.name, t); c.tag = t; }
-                case "color" -> c.color = ClanData.color(value);
+                case "tag" -> { String t = ClanData.tag(value); unique(s, c.id, c.name, t); c.tag = t; c.color = 0xFFFFFF; }
                 default -> throw new IllegalArgumentException(field);
             }
             return null;

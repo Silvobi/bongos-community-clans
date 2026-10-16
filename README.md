@@ -1,4 +1,4 @@
-# Bongo's Community Clans — 1.0.3
+# Bongo's Community Clans — 1.0.4
 
 
 ## Autorstwo AI / AI disclosure
@@ -15,7 +15,7 @@ Mod serwerowy Fabric dla **Minecraft Java 26.3**. Działa z klientem vanilla; gr
 
 - Minecraft Java 26.3, Java 25, Fabric Loader 0.19.5 lub nowszy zgodny z 26.3.
 - Fabric API 0.161.0+26.3.
-- Umieść `BongosCommunityClans-1.0.3.jar` w `mods/`, usuń poprzedni JAR tego moda i uruchom ponownie serwer. Zwykłe `/reload` nie ładuje modów.
+- Umieść `BongosCommunityClans-1.0.4.jar` w `mods/`, usuń poprzedni JAR tego moda i uruchom ponownie serwer. Zwykłe `/reload` nie ładuje modów.
 - Na wskazanym serwerze testowym Fabric API jest już zainstalowane.
 
 Paczka jest budowana z przetworzonych zasobów przez `tools/build-cat-pack.py`; nie używa animowanej tekstury z globalną fazą. Każda klatka ma osobny model wybierany przez serwer.
@@ -24,11 +24,11 @@ Paczka jest budowana z przetworzonych zasobów przez `tools/build-cat-pack.py`; 
 
 ```text
 /clan create MasloTeamX MasloTeamX
-/clan change color #a1b2c3
+/clan change tag &#a1b2c3Maslo&4TeamX
 /clan invite Kolega
 ```
 
-Zaproszony gracz wpisuje `/clan accept`. Przed nickiem pojawi się `[MasloTeamX] Nick` na czacie, w TAB i w nametagu nad głową. Kolor dotyczy prefixu, a nie nicku; domyślnie jest biały.
+Zaproszony gracz wpisuje `/clan accept`. Przed nickiem pojawi się `[MasloTeamX] Nick` na czacie, w TAB i w nametagu nad głową. Kody kolorów wpisuje się bezpośrednio w tagu; każdy fragment może mieć inny kolor. Nick i nawiasy pozostają białe.
 
 ## Komendy
 
@@ -46,8 +46,7 @@ Zaproszony gracz wpisuje `/clan accept`. Przed nickiem pojawi się `[MasloTeamX]
 | `/clan demote <username> <class>` | Degraduje wskazanego członka |
 | `/clan transfer <username>` | Przekazuje założyciela; poprzedni staje się współzałożycielem |
 | `/clan change name <name>` | Zmienia pełną nazwę |
-| `/clan change tag <tag>` | Zmienia tag |
-| `/clan change color <color>` | Zmienia kolor prefixu |
+| `/clan change tag <tag>` | Zmienia tag i jego kolory, np. `&1Super&4Clan` lub `&#000000Super&#ff0000Clan` |
 | `/clan chat <message>` | Wysyła wiadomość do osób online w klanie |
 | `/clan quickchat` | Włącza/wyłącza wysyłanie wiadomości `#...` do klanu |
 | `/clan info [page]` | Otwiera GUI skrzyni z informacjami i członkami |
@@ -68,12 +67,13 @@ Obsługiwane są też polskie nazwy rang: `założyciel`, `współzałożyciel`,
 
 ## Nazwy, Unicode i kolory
 
-- Nazwa: 1–32 znaki; litery (także polskie), cyfry dziesiętne i `-_.`; bez spacji.
-- Tag: 1–12 punktów kodowych Unicode, po normalizacji NFC. Emoji spoza podstawowej płaszczyzny liczy się jako jeden znak; sekwencje złożonych emoji mogą liczyć się jako kilka. Tag może zawierać spacje i symbole. Odrzucane są puste/białe tagi, nowe linie, znaki sterujące i `§`.
-- Przykłady: `/clan create Zażółć ★🧈★`, `/clan change tag "Masło Team"`. Cudzysłowy wokół tagu są opcjonalne; pomagają oznaczyć spacje na początku/końcu. Dosłowne cudzysłowy można wpisać w cytowanym tagu jako `\"`.
-- Nazwy i tagi są unikalne, bez rozróżniania wielkości liter.
+- Nazwa: 1–32 znaki; litery (także polskie), cyfry dziesiętne i `-_.`; bez spacji. Kody kolorów są zabronione zarówno przy tworzeniu klanu, jak i zmianie nazwy.
+- Tag: 1–12 punktów kodowych Unicode, po normalizacji NFC i pominięciu poprawnych kodów kolorów. Emoji spoza podstawowej płaszczyzny liczy się jako jeden znak; sekwencje złożonych emoji mogą liczyć się jako kilka. Tag może zawierać spacje i symbole. Odrzucane są tagi puste/białe (także po usunięciu kodów kolorów), nowe linie, znaki sterujące i `§`.
+- Przykłady: `/clan create Zażółć &a★🧈★`, `/clan change tag &1Super&4Clan`, `/clan change tag &#000000Super&#ff0000Clan`, `/clan change tag "&aMasło &bTeam"`. Cudzysłowy wokół tagu są opcjonalne; pomagają oznaczyć spacje na początku/końcu. Dosłowne cudzysłowy można wpisać w cytowanym tagu jako `\"`.
+- Nazwy i tagi są unikalne, bez rozróżniania wielkości liter. Przy sprawdzaniu unikalności tagu kody kolorów są pomijane: `&aClan` i `&bCLAN` to ten sam tag.
 - Wygląd glifów zależy od czcionki/zasobów klienta. Serwer nie zna listy glifów obsługiwanych przez każdy klient.
-- Kolory: `#ffffff`, `#a1b2c3`, `&a`, `a`, `white`, `dark_red` i pozostałe standardowe nazwy/kody Minecrafta. Kody stylu, takie jak `&k`, nie są kolorami. Parser obsługuje również `§a`, ale klient vanilla nie pozwala wysłać `§` w komendzie — użyj `&a`.
+- Kolory w tagu: `&0`–`&f` oraz `&#RRGGBB`, bez rozróżniania wielkości liter. Można je dowolnie mieszać; kod działa do kolejnego kodu lub końca tagu. Kody nie zajmują limitu 12 znaków. Tekst przed pierwszym kodem jest biały. Inne sekwencje z `&`, w tym kody stylu takie jak `&k` oraz niepoprawne kody HEX, pozostają dosłownym tekstem i liczą się do limitu.
+- Komenda `/clan change color` została usunięta. Istniejące klany zachowują poprzedni kolor jako domyślny do czasu zmiany tagu. Wpisanie nowego tagu bez kodów przywraca biały kolor.
 
 ## Czat, zaproszenia i język
 
@@ -85,7 +85,7 @@ Komunikaty, okno usunięcia i GUI są renderowane przez serwer w języku danego 
 
 ## Okna i zapis
 
-GUI informacji pokazuje nazwę, tag, datę utworzenia w UTC, założyciela, kolor i główki członków z rangą oraz statusem online/offline. Strona mieści 36 członków; na dole znajdują się strzałki stron i zamknięcie. Wszystkie metody przenoszenia/klonowania przedmiotów z GUI są zablokowane. Główki osób online korzystają z ich aktualnego profilu.
+GUI informacji pokazuje nazwę, kolorowy tag, datę utworzenia w UTC, założyciela i główki członków z rangą oraz statusem online/offline. Strona mieści 36 członków; na dole znajdują się strzałki stron i zamknięcie. Wszystkie metody przenoszenia/klonowania przedmiotów z GUI są zablokowane. Główki osób online korzystają z ich aktualnego profilu.
 
 Okno usunięcia odlicza 10 rzeczywistych sekund i pozwala anulować. Potwierdzenie ma losowy token przypisany do konkretnego gracza i klanu; wygasa po 90 sekundach. Serwer sprawdza czas, członkostwo i rangę, także przy ręcznie spreparowanym pakiecie. Rozłączenie usuwa oczekujące potwierdzenie. Niewykorzystane potwierdzenia nie przetrwają restartu.
 
@@ -101,7 +101,7 @@ Zainstaluj JDK 25, ustaw `JAVA_HOME`, a następnie:
 gradlew.bat build
 ```
 
-Gotowy mod znajduje się w `build/libs/BongosCommunityClans-1.0.0.jar`. Wrapper i zweryfikowany build korzystają z Gradle 9.6.0. Loom: 1.17.12. Źródła i testy znajdują się w tej paczce.
+Gotowy mod znajduje się w `build/libs/BongosCommunityClans-1.0.4.jar`. Wrapper i zweryfikowany build korzystają z Gradle 9.6.0. Loom: 1.17.12. Źródła i testy znajdują się w tej paczce.
 
 Testy JUnit obejmują role/hierarchię, zaproszenia i ich unieważnianie, przekazanie założyciela, zapis/restart, awarie zapisu, uszkodzone dane, Unicode, kolory i kompletność tłumaczeń. Testy protokołu uruchamia się wyłącznie na osobnym serwerze offline dostępnym lokalnie (domyślnie port 25581):
 
