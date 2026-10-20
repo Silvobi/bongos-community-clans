@@ -17,7 +17,7 @@ public final class ClanCommands {
     @FunctionalInterface private interface Action { void run(ClanRuntime runtime, ServerPlayer player); }
     private static int run(CommandContext<CommandSourceStack> ctx, Action action) {
         ServerPlayer p = ctx.getSource().getPlayer();
-        if (p == null) { ctx.getSource().sendFailure(Component.literal("This command is available to players. / Ta komenda jest dostępna dla graczy.")); return 0; }
+        if (p == null) { ctx.getSource().sendFailure(Component.literal(Lang.text((String) null, "player_only"))); return 0; }
         if (CommunityClans.runtime == null) { p.sendSystemMessage(Lang.component(p, "unavailable")); return 0; }
         try { action.run(CommunityClans.runtime, p); return 1; }
         catch (ClanException e) { CommunityClans.runtime.tell(p, e.key); return 0; }
@@ -55,19 +55,24 @@ public final class ClanCommands {
     }
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var root = literal("clan").executes(c -> run(c, (r,p) -> help(r,p)));
+        var top=literal("top").executes(c->run(c,(r,p)->pl.bongo.clans.claims.ClaimLeaderboard.show(r,p,true,1)));
+        for(String sort:List.of("area","claims")) top.then(literal(sort)
+            .executes(c->run(c,(r,p)->pl.bongo.clans.claims.ClaimLeaderboard.show(r,p,sort.equals("area"),1)))
+            .then(argument("page",IntegerArgumentType.integer(1)).executes(c->run(c,(r,p)->pl.bongo.clans.claims.ClaimLeaderboard.show(r,p,sort.equals("area"),IntegerArgumentType.getInteger(c,"page"))))));
+        root.then(top);
         root.then(literal("cat").executes(c -> run(c, (r,p) -> r.cat.request(p))));
         root.then(literal("help").executes(c -> run(c, (r,p) -> help(r,p))));
         root.then(literal("create").then(argument("name_tag", StringArgumentType.greedyString())
                 .executes(c -> run(c, (r,p) -> {
                     String[] parts=createArguments(str(c,"name_tag"));
                     r.service.create(p.getUUID(), p.getGameProfile().name(), parts[0],parts[1]);
-                    Clan clan = r.service.require(p.getUUID()); r.tell(p,"created",clan.name,clan.tag); r.refreshDisplay();
+                    Clan clan = r.service.require(p.getUUID()); r.tell(p,"created",clan.name,CommunityClans.bracketedTag(clan)); r.refreshDisplay();
                 }))));
         root.then(literal("invite").requires(s -> hasPower(s,1)).then(username(true).executes(c -> run(c,(r,p) -> {
             ServerPlayer target = r.server.getPlayerList().getPlayerByName(str(c,"username"));
             if (target == null) throw new ClanException("player_offline");
             r.service.invite(p.getUUID(),target.getUUID()); Clan clan = r.service.require(p.getUUID());
-            r.tell(p,"invited",target.getGameProfile().name()); r.tell(target,"invitation",p.getGameProfile().name(),clan.name,clan.tag);
+            r.tell(p,"invited",target.getGameProfile().name()); r.tell(target,"invitation",p.getGameProfile().name(),clan.name,CommunityClans.bracketedTag(clan));
         }))));
         root.then(literal("accept").executes(c -> run(c,(r,p) -> {
             r.service.accept(p.getUUID(),p.getGameProfile().name()); r.broadcast(r.service.require(p.getUUID()),"accepted",p.getGameProfile().name()); r.refreshDisplay();
@@ -100,11 +105,11 @@ public final class ClanCommands {
             Clan clan = r.service.require(p.getUUID()); r.broadcast(clan,"transfer_done",clan.members.get(target).name); r.refreshCommands();
         }))));
         var change = literal("change").requires(s -> hasPower(s,2));
-        for (String field : List.of("name","tag","color")) change.then(literal(field)
+        for (String field : List.of("name","tag")) change.then(literal(field)
                 .then(argument("value",StringArgumentType.greedyString())
                 .executes(c -> run(c,(r,p) -> {
                     r.service.change(p.getUUID(),field,textArgument(str(c,"value"))); Clan clan = r.service.require(p.getUUID());
-                    Object value = switch (field) { case "name" -> clan.name; case "tag" -> clan.tag; default -> String.format("#%06X",clan.color); };
+                    Object value = field.equals("name") ? clan.name : CommunityClans.bracketedTag(clan);
                     r.broadcast(clan,"changed_" + field,value); r.refreshDisplay();
                 }))));
         root.then(change);
@@ -114,6 +119,7 @@ public final class ClanCommands {
         dispatcher.register(root);
     }
     private static void help(ClanRuntime r, ServerPlayer p) {
+        p.sendSystemMessage(net.minecraft.network.chat.Component.literal("/clan top area|claims [page]"));
         for (String key : List.of("help_title","help_create","help_members","help_roles","help_change","help_chat","help_info","help_ranks")) r.tell(p,key);
     }
 }

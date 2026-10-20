@@ -39,6 +39,10 @@ import javax.crypto.*;
 public final class IntegrationHarness {
     static int port;
     static void check(boolean result,String label) { if(!result) throw new AssertionError(label); System.out.println("PASS: "+label); }
+    static boolean hasColor(Component component, int rgb) {
+        return component.visit((Style style, String text) -> style.getColor()!=null && style.getColor().getValue()==rgb
+                && !text.isEmpty() ? Optional.of(true) : Optional.empty(),Style.EMPTY).orElse(false);
+    }
     public static void main(String[] args) throws Exception {
         SharedConstants.tryDetectVersion(); Bootstrap.bootStrap(); port=Integer.parseInt(args[0]);
         // This headless decoder only asserts count and explicit item patches, not vanilla base components.
@@ -49,11 +53,14 @@ public final class IntegrationHarness {
         try(Bot owner=new Bot("CF"+suffix,"pl_pl"); Bot peer=new Bot("CM"+suffix,"en_us"); Bot outsider=new Bot("CO"+suffix,"en_us")) {
             owner.drain(100); peer.drain(100); outsider.drain(100);
             String clan="Clans"+suffix;
-            owner.command("clan create "+clan+" "+tag); owner.message("Utworzono klan"); owner.drain(150);
+            owner.command("clan create "+clan+" &1"+tag); owner.message("Utworzono klan"); owner.drain(150);
             check(owner.teams.values().stream().anyMatch(p->p.playerPrefix().getString().equals("["+tag+"] ")),"Unicode team prefix is sent for vanilla nametags");
             check(owner.tabs.get(owner.uuid).getString().equals("["+tag+"] "+owner.name),"TAB gets the exact prefix and player name");
-            owner.command("clan change color #12ab34"); owner.message("Kolor klanu"); owner.drain(150);
-            check(owner.teams.values().stream().anyMatch(p->p.playerPrefix().getStyle().getColor()!=null && p.playerPrefix().getStyle().getColor().getValue()==0x12AB34),"hex prefix color reaches vanilla team packets");
+            check(hasColor(owner.tabs.get(owner.uuid),0x0000AA),"inline legacy color works when creating a clan");
+            owner.command("clan change tag &#12ab34"+tag.substring(0,tag.length()-1)+"&4★"); owner.message("Tag klanu"); owner.drain(150);
+            check(owner.teams.values().stream().anyMatch(p->hasColor(p.playerPrefix(),0x12AB34) && hasColor(p.playerPrefix(),0xAA0000)),"mixed HEX and legacy colors reach vanilla team packets");
+            check(hasColor(owner.tabs.get(owner.uuid),0x12AB34) && hasColor(owner.tabs.get(owner.uuid),0xAA0000),"TAB receives both tag colors without raw codes");
+            owner.command("clan change name &aBadName"); owner.message("Kody kolorów są niedozwolone");
             owner.command("clan invite "+peer.name); owner.message("Zaproszono"); peer.message("invites you");
             peer.command("clan accept"); peer.message("joined the clan"); owner.message("dołączył");
             peer.drain(100);
@@ -65,11 +72,14 @@ public final class IntegrationHarness {
             check(outsider.messages.stream().noneMatch(m->m.getString().contains("PRIVATE_QUICK_")),"#quickchat cannot leak to public chat with NoChatReports installed");
             owner.chat("PUBLIC_"+suffix); Component publicChat=outsider.message("PUBLIC_");
             check(publicChat.getString().contains("["+tag+"] "+owner.name),"public chat includes the clan prefix");
+            check(hasColor(publicChat,0x12AB34) && hasColor(publicChat,0xAA0000),"public chat keeps the mixed tag colors");
             peer.command("clan info"); var open=(ClientboundOpenScreenPacket)peer.await(p->p instanceof ClientboundOpenScreenPacket,5000);
             check(open.getType()==MenuType.GENERIC_9x6 && open.getTitle().getString().contains(clan),"info opens a vanilla chest GUI");
             var content=(ClientboundContainerSetContentPacket)peer.await(p->p instanceof ClientboundContainerSetContentPacket c && c.containerId()==open.getContainerId(),5000);
             check(!content.items().get(4).isEmpty() && !content.items().get(9).isEmpty() && !content.items().get(10).isEmpty(),"GUI contains clan metadata and member heads");
             check(content.items().get(4).get(DataComponents.LORE).lines().stream().anyMatch(c->c.getString().contains("Founder:")),"GUI uses the viewer's English locale");
+            check(content.items().get(4).get(DataComponents.LORE).lines().stream().anyMatch(c->c.getString().contains("Tag: ["+tag+"]")
+                    && hasColor(c,0x12AB34) && hasColor(c,0xAA0000)),"GUI lore displays the colored tag without raw codes");
             for(ContainerInput input:List.of(ContainerInput.PICKUP,ContainerInput.QUICK_MOVE,ContainerInput.SWAP,ContainerInput.THROW,ContainerInput.CLONE,ContainerInput.QUICK_CRAFT,ContainerInput.PICKUP_ALL)) {
                 peer.send(new ServerboundContainerClickPacket(open.getContainerId(),content.stateId(),(short)9,(byte)0,input,new Int2ObjectOpenHashMap<>(),HashedStack.EMPTY));
                 var unchanged=(ClientboundContainerSetContentPacket)peer.await(p->p instanceof ClientboundContainerSetContentPacket c && c.containerId()==open.getContainerId(),5000);
@@ -105,7 +115,7 @@ public final class IntegrationHarness {
             owner.send(new ServerboundCustomClickActionPacket(action.id(),Optional.empty())); owner.message("Potwierdzenie wygasło");
             check(true,"used confirmation tokens cannot be replayed");
             peer.command("clan ignore"); peer.message("Ignoring invitations enabled");
-            owner.command("clan create "+clan+" N"+suffix); owner.message("Utworzono klan");
+            owner.command("clan create "+clan+" &aN"+suffix); owner.message("Utworzono klan");
             owner.command("clan invite "+peer.name); owner.message("ignoruje zaproszenia");
             owner.command("clan invite "+outsider.name); owner.message("Zaproszono"); outsider.message("invites you");
             outsider.command("clan accept"); outsider.message("joined the clan");
@@ -121,6 +131,7 @@ public final class IntegrationHarness {
             owner.drain(300);
             Component tab=owner.tabs.get(owner.uuid);
             check(tab!=null && tab.getString().startsWith("[N"),"clan membership and TAB tag survive a real server restart");
+            check(hasColor(tab,0x55FF55),"inline tag color survives a real server restart");
             check(owner.teams.values().stream().anyMatch(p->p.playerPrefix().getString().startsWith("[N")),"nametag team is restored after restart");
             owner.chat("#RESTART_PRIVATE"); owner.message("[KLAN]");
             check(true,"quickchat preference survives restart");
@@ -132,8 +143,8 @@ public final class IntegrationHarness {
             var page2=(ClientboundContainerSetContentPacket)owner.await(p->p instanceof ClientboundContainerSetContentPacket c && c.containerId()==next.getContainerId(),5000);
             check(page2.items().get(49).get(DataComponents.CUSTOM_NAME).getString().equals("Strona 2 / 2") && !page2.items().get(9).isEmpty(),"next page contains remaining members");
             owner.send(new ServerboundContainerClosePacket(next.getContainerId()));
-            owner.command("clan change color &a"); owner.message("Kolor klanu"); owner.drain(100);
-            check(owner.teams.values().stream().anyMatch(p->p.playerPrefix().getStyle().getColor()!=null && p.playerPrefix().getStyle().getColor().getValue()==0x55FF55),"legacy &a color code works unquoted");
+            owner.command("clan change tag &aRestart"); owner.message("Tag klanu"); owner.drain(100);
+            check(owner.teams.values().stream().anyMatch(p->hasColor(p.playerPrefix(),0x55FF55)),"inline &a color code works unquoted after restart");
         }
     }
     @SuppressWarnings({"rawtypes","unchecked"})

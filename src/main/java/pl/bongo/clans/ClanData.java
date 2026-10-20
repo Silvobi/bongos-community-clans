@@ -34,7 +34,7 @@ public final class ClanData {
     public static class Clan {
         public UUID id;
         public String name, tag;
-        public int color = 0xFFFFFF;
+        public int color = 0xFFFFFF; // Fallback for tags saved before inline colors were supported.
         public long createdAt;
         public Map<UUID, Member> members = new LinkedHashMap<>();
         public Member founder() { return members.values().stream().filter(m -> m.role == Role.FOUNDER).findFirst().orElseThrow(); }
@@ -66,25 +66,16 @@ public final class ClanData {
     }
     public static String tag(String raw) {
         String value = Normalizer.normalize(raw, Normalizer.Form.NFC);
-        if (value.isBlank() || value.codePointCount(0, value.length()) > 12
+        String plain = ClanTag.plainText(value);
+        if (plain.isBlank() || plain.codePointCount(0, plain.length()) > 12
                 || value.codePoints().anyMatch(c -> c == 0xA7 || Character.isISOControl(c)
                 || (c >= 0xD800 && c <= 0xDFFF) || c == 0x2028 || c == 0x2029)) throw new ClanException("bad_tag");
         return value;
     }
-    public static int color(String raw) {
-        String value = raw.toLowerCase(Locale.ROOT);
-        if (value.matches("#[0-9a-f]{6}")) return Integer.parseInt(value.substring(1), 16);
-        if (value.length() == 2 && (value.charAt(0) == '&' || value.charAt(0) == '§')) value = value.substring(1);
-        String[] names = {"black", "dark_blue", "dark_green", "dark_aqua", "dark_red", "dark_purple", "gold", "gray", "dark_gray", "blue", "green", "aqua", "red", "light_purple", "yellow", "white"};
-        int[] rgb = {0x000000,0x0000AA,0x00AA00,0x00AAAA,0xAA0000,0xAA00AA,0xFFAA00,0xAAAAAA,0x555555,0x5555FF,0x55FF55,0x55FFFF,0xFF5555,0xFF55FF,0xFFFF55,0xFFFFFF};
-        int index = value.length() == 1 ? "0123456789abcdef".indexOf(value) : Arrays.asList(names).indexOf(value);
-        if (index < 0) throw new ClanException("bad_color");
-        return rgb[index];
-    }
     public static void unique(State state, UUID except, String name, String tag) {
         for (Clan clan : state.clans.values()) if (!clan.id.equals(except)) {
             if (clan.name.equalsIgnoreCase(name)) throw new ClanException("name_taken");
-            if (clan.tag.equalsIgnoreCase(tag)) throw new ClanException("tag_taken");
+            if (ClanTag.plainText(clan.tag).equalsIgnoreCase(ClanTag.plainText(tag))) throw new ClanException("tag_taken");
         }
     }
     public static void validate(State state) {

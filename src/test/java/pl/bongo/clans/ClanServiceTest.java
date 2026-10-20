@@ -60,11 +60,11 @@ class ClanServiceTest {
         assertEquals(1,new ClanStore(dir.resolve("clans.json")).state().clans.size());
     }
     @Test void changesPreferencesAndMembershipSurviveRestart() throws Exception {
-        service.change(cofounder,"name","Zażółć_123.-"); service.change(cofounder,"tag","★🧈★");
-        service.change(cofounder,"color","#a1b2c3"); service.quickchat(member); service.ignore(outsider);
+        service.change(cofounder,"name","Zażółć_123.-"); service.change(cofounder,"tag","&1★&#a1b2c3🧈&4★");
+        service.quickchat(member); service.ignore(outsider);
         ClanStore reloaded=new ClanStore(dir.resolve("clans.json"));
         Clan c=reloaded.state().clan(member);
-        assertEquals("★🧈★",c.tag); assertEquals(0xA1B2C3,c.color); assertEquals("Zażółć_123.-",c.name);
+        assertEquals("&1★&#a1b2c3🧈&4★",c.tag); assertEquals(0xFFFFFF,c.color); assertEquals("Zażółć_123.-",c.name);
         assertEquals(Role.COFOUNDER,c.members.get(cofounder).role);
         assertTrue(reloaded.state().users.get(member).quickchat); assertTrue(reloaded.state().users.get(outsider).ignoreInvites);
         assertTrue(Files.exists(dir.resolve("clans.json.bak")));
@@ -99,13 +99,59 @@ class ClanServiceTest {
         denied("bad_tag",()->ClanData.tag("   ")); denied("bad_name",()->ClanData.name("a b"));
         denied("bad_name",()->ClanData.name("a".repeat(33)));
         assertEquals("ą",ClanData.name("a\u0328"));
-        assertEquals(0x55FF55,ClanData.color("&a")); assertEquals(0xFFFFFF,ClanData.color("white"));
-        assertEquals(0,ClanData.color("#000000")); denied("bad_color",()->ClanData.color("&k"));
+    }
+    @Test void inlineColorsDoNotCountTowardsUnicodeTagLimit() {
+        String twelve = "&#123456🧈&A".repeat(12);
+        assertEquals(twelve,ClanData.tag(twelve));
+        denied("bad_tag",()->ClanData.tag(twelve+"&0🧈"));
+        assertEquals("&1Super&4Clan",ClanData.tag("&1Super&4Clan"));
+        assertEquals("&aą",ClanData.tag("&aa\u0328"));
+        for (String tag : List.of("&a", "&#000000", "&a &4  ", "&a\nX", "&a§cX", "&a\uD800"))
+            denied("bad_tag",()->ClanData.tag(tag));
+        assertEquals("R&z&k&#12x",ClanTag.plainText(ClanData.tag("R&z&k&#12x")));
+        denied("bad_tag",()->ClanData.tag("&k".repeat(7)));
+    }
+    @Test void namesRejectColorsOnCreationAndRenameWithoutChangingData() {
+        for (String name : List.of("&aName", "&#000000Name", "§aName", "Na&4me")) {
+            denied("bad_name",()->service.create(outsider,"Outsider",name,"Other"));
+            denied("bad_name",()->service.change(founder,"name",name));
+        }
+        assertEquals("MasloTeamX",service.require(founder).name);
+        assertNull(service.state().clan(outsider));
+    }
+    @Test void coloredTagsAreCreatedAndComparedByTheirPlainText() throws Exception {
+        denied("tag_taken",()->service.create(outsider,"Outsider","Other","&#ff0000maslo&ATeamX"));
+        service.create(outsider,"Outsider","Other","&1Super&4Clan");
+        assertEquals("&1Super&4Clan",new ClanStore(dir.resolve("clans.json")).state().clan(outsider).tag);
+        denied("tag_taken",()->service.change(founder,"tag","&#000000SUPERclan"));
+        assertEquals("MasloTeamX",service.require(founder).tag);
+        service.change(outsider,"tag","&aSuper&bClan");
+        assertEquals("&aSuper&bClan",service.require(outsider).tag);
+    }
+    @Test void oldSavedColorsSurviveLoadingUntilTheTagIsEdited() throws Exception {
+        store.update(s -> { s.clan(founder).color=0x123456; return null; });
+        ClanService reloaded=new ClanService(new ClanStore(dir.resolve("clans.json")));
+        assertEquals(0x123456,reloaded.require(founder).color);
+        reloaded.change(founder,"tag","&aNewTag");
+        assertEquals(0xFFFFFF,reloaded.require(founder).color);
+        reloaded.change(founder,"tag","PlainTag");
+        assertEquals(0xFFFFFF,reloaded.require(founder).color);
+        assertThrows(IllegalArgumentException.class,()->reloaded.change(founder,"color","&a"));
     }
     @Test void polishAndEnglishHaveIdenticalMessageCoverage() {
         assertEquals(Lang.keys("en"),Lang.keys("pl"));
         assertEquals("pl",Lang.language("pl_pl")); assertEquals("en",Lang.language("de_de"));
         assertEquals("Founder",Lang.text("en_us","role_founder"));
         assertEquals("Założyciel",Lang.text("pl_pl","role_founder"));
+        assertEquals("pl",Lang.language("PL_pl"));
+        assertEquals("en",Lang.language(null));
+        assertEquals("This command is available to players.",Lang.text((String)null,"player_only"));
+        for (String key : Lang.keys("en")) {
+            // Both catalogs use %s. Extra arguments also cover keys without placeholders.
+            String[] args = java.util.Collections.nCopies(8,"VALUE").toArray(String[]::new);
+            String pl = Lang.text("pl_pl",key,(Object[])args), en = Lang.text("en_us",key,(Object[])args);
+            assertFalse(pl.isBlank(),key); assertFalse(en.isBlank(),key);
+            assertEquals(pl.split("VALUE",-1).length,en.split("VALUE",-1).length,key);
+        }
     }
 }
