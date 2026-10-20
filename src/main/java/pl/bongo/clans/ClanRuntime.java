@@ -126,7 +126,9 @@ public final class ClanRuntime {
         Clan c = service.state().clans.get(request.clan);
         if (c == null) return;
         var common = new CommonDialogData(Lang.component(player, "delete_title", c.name), Optional.empty(), false, false,
-                DialogAction.WAIT_FOR_RESPONSE, List.of(new PlainMessage(Lang.component(player, "delete_body"), 340)), List.of());
+                // The countdown button has no action. NONE keeps the dialog visible when it is clicked,
+                // while WAIT_FOR_RESPONSE would open a waiting screen without sending any packet.
+                DialogAction.NONE, List.of(new PlainMessage(Lang.component(player, "delete_body"), 340)), List.of());
         ActionButton confirm = seconds > 0 ? button(Lang.component(player, "delete_countdown", seconds).copy().withStyle(ChatFormatting.GRAY), null)
                 : button(Lang.component(player, "delete_confirm").copy().withStyle(ChatFormatting.RED), "confirm/" + request.token);
         player.openDialog(Holder.direct(new MultiActionDialog(common, List.of(confirm),

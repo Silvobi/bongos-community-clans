@@ -10,7 +10,7 @@ Zainstaluj JDK 25, ustaw `JAVA_HOME`, a następnie:
 gradlew.bat build
 ```
 
-Gotowy mod znajduje się w `build/libs/BongosCommunityClans-1.1.1.jar`. Wrapper i zweryfikowany build korzystają z Gradle 9.6.0. Loom: 1.17.12. Źródła i testy znajdują się w tej paczce.
+Gotowy mod znajduje się w `build/libs/BongosCommunityClans-1.1.2.jar`. Wrapper i zweryfikowany build korzystają z Gradle 9.6.0. Loom: 1.17.12. Źródła i testy znajdują się w tej paczce.
 
 Testy JUnit obejmują role/hierarchię, zaproszenia i ich unieważnianie, przekazanie założyciela, zapis/restart, awarie zapisu, uszkodzone dane, Unicode, kolory i kompletność tłumaczeń. Testy protokołu uruchamia się wyłącznie na osobnym serwerze offline dostępnym lokalnie (domyślnie port 25581):
 
@@ -26,6 +26,6 @@ Referencje wersji: [Fabric dla Minecraft 26.3](https://www.fabricmc.net/2026/09/
 
 W [repozytorium BongosTeleports](https://github.com/Silvobi/bongos-teleports) zadanie `sharedClaimsTest` testuje wszystkie trzy mody i GP3D 19.0.0. Sprawdza budowanie, skrzynie, natywne trusty, dołączenie i wyrzucenie z klanu, odmowy, poddziałki 3D, lokalne flagi, ranking i restart.
 
-`clanTagCompatibilityTest -PpreviousClansJar=/ścieżka/BongosCommunityClans-1.1.0.jar -PfixedClansJar=/ścieżka/BongosCommunityClans-1.1.1.jar` odtwarza błąd `bad_tag` starej wersji, a następnie sprawdza poprawny start i restart tej samej bazy z nowym modem, kolory, czat, GUI i trusty. Oba JAR-y muszą znajdować się poza `verification-allmods/mods`, ponieważ test tymczasowo podmienia mod i przywraca nowszy w bloku końcowym.
+`clanTagCompatibilityTest -PpreviousClansJar=/ścieżka/BongosCommunityClans-1.1.0.jar -PfixedClansJar=/ścieżka/BongosCommunityClans-1.1.2.jar` odtwarza błąd `bad_tag` starej wersji, a następnie sprawdza poprawny start i restart tej samej bazy z nowym modem, kolory, czat, GUI i trusty. Oba JAR-y muszą znajdować się poza `verification-allmods/mods`, ponieważ test tymczasowo podmienia mod i przywraca nowszy w bloku końcowym.
 
 Te zadania wymagają oddzielnego, przygotowanego `verification-allmods` z markerem fixture, aktualnymi modami i JAR-em testowym. Resetują dane testowego świata. Instrukcje i ograniczenia są opisane w repozytorium Teleports. Nie używaj serwera produkcyjnego ani jego świata.

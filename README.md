@@ -1,15 +1,17 @@
-# Bongo's Community Clans 1.1.1
+# Bongo's Community Clans 1.1.2
 
 Serwerowy mod Fabric dla **Minecraft Java 26.3**: klany z rangami, kolorowymi tagami, prywatnym czatem, GUI oraz opcjonalnym współdzieleniem działek i rankingiem GP3D. Klient vanilla nie potrzebuje dodatkowego moda.
 
 ## Wymagania i instalacja
 
 - **Java 25**, Fabric Loader **0.19.5+**, Fabric API **0.161.0+26.3**.
-- Opcjonalnie: **GriefPrevention3D 19.0.0** (uniwersalny JAR) i [BongoUtils 1.6.2](https://github.com/Silvobi/bongo-utils) do panelu flag.
+- Opcjonalnie: **GriefPrevention3D 19.0.0** (uniwersalny JAR) i [BongoUtils 1.7.0](https://github.com/Silvobi/bongo-utils) do panelu flag.
 
-Zatrzymaj serwer, wykonaj kopię świata, usuń poprzedni JAR klanów i umieść `BongosCommunityClans-1.1.1.jar` w `mods/`. Zachowaj `<świat>/bongo-community-clans.json` i `.bak`. Uruchom ponownie serwer; `/reload` nie podmienia modów.
+Zatrzymaj serwer, wykonaj kopię świata, usuń poprzedni JAR klanów i umieść `BongosCommunityClans-1.1.2.jar` w `mods/`. Zachowaj `<świat>/bongo-community-clans.json` i `.bak`. Uruchom ponownie serwer; `/reload` nie podmienia modów.
 
 **Aktualizacja po błędzie `bad_tag` z 1.1.0:** ta wersja łączy kolorowe tagi z GP3D. Limit 12 znaków dotyczy widocznego tagu, pomijając poprawne kody kolorów. Długi zapis gradientu nie blokuje startu. Nie skracaj tagów ani nie kasuj bazy klanów; wystarczy wymiana JAR-a. Walidacja uszkodzonych danych pozostaje aktywna.
+
+Wersja 1.1.2 usuwa też przejście do „Oczekiwania na serwer” po kliknięciu nieaktywnego odliczania usunięcia klanu. Odliczanie pozostaje widoczne; zatwierdzenie i anulowanie nadal sprawdza serwer.
 
 ## Pierwszy klan
 
@@ -63,9 +65,9 @@ Opcjonalna integracja z uniwersalnym **GriefPrevention3D 19.0.0**, Fabric **26.3
 
 Dodatkowe prawo jest sprawdzane przez silnik GP3D przy każdej operacji. Dołączenie daje je od razu; wyjście, wyrzucenie lub usunięcie klanu od razu je odbiera. Mod nie modyfikuje natywnych list trustów. Ręcznie nadane prawa pozostają niezależne od członkostwa. Założyciel klanu nie otrzymuje Manage Trust, prawa usunięcia/przejęcia działki ani zmiany właściciela. Jawne odmowy GP3D oraz działki i poddziałki administracyjne nie są omijane.
 
-Ograniczone i zagnieżdżone poddziałki nie otrzymują domyślnie tego dodatkowego prawa. Z **BongoUtils 1.6.2** właściciel lub osoba z Manage Trust może użyć `/manageclaim` i ustawić w nich lokalną flagę **Dostęp członków klanu**. W zwykłych poddziałkach lokalne `off` również działa niezależnie od dostępu w działce nadrzędnej. Dostępne poziomy: `off`, `access`, `container`, `build`.
+Ograniczone i zagnieżdżone poddziałki nie otrzymują domyślnie tego dodatkowego prawa. Z **BongoUtils 1.7.0** właściciel lub osoba z Manage Trust może użyć `/manageclaim` i ustawić w nich lokalną flagę **Dostęp członków klanu**. W zwykłych poddziałkach lokalne `off` również działa niezależnie od dostępu w działce nadrzędnej. Dostępne poziomy: `off`, `access`, `container`, `build`.
 
-`/manageclaim global` ustawia domyślny poziom na działkach właściciela; lokalne wyjątki mają pierwszeństwo dla każdej flagi osobno. Domyślny poziom to `build`. Bez BongoUtils integracja klanowa nadal działa z domyślnym Build Trust, z zachowaniem odmów i ograniczeń poddziałek. **BongosTeleports 1.5.0** rozpoznaje ten sam dodatkowy trust dla TPA, padów i ich zarządzania (z zachowaniem dotychczasowej własności pada).
+`/manageclaim global` ustawia domyślny poziom na działkach właściciela; lokalne wyjątki mają pierwszeństwo dla każdej flagi osobno. Domyślny poziom to `build`. Bez BongoUtils integracja klanowa nadal działa z domyślnym Build Trust, z zachowaniem odmów i ograniczeń poddziałek. **BongosTeleports 1.6.0** rozpoznaje ten sam dodatkowy trust dla TPA, padów i ich zarządzania (z zachowaniem dotychczasowej własności pada).
 
 ### Ranking działek
 
@@ -105,11 +107,11 @@ Okno usunięcia odlicza 10 rzeczywistych sekund i pozwala anulować. Potwierdzen
 
 Dane znajdują się w `<katalog świata>/bongo-community-clans.json`. Każda zmiana zapisuje zweryfikowaną kopię przez plik tymczasowy i zachowuje poprzednią wersję w `.bak`. Błąd zapisu nie zatwierdza zmiany w pamięci. Uszkodzony plik zatrzymuje uruchamianie obsługi klanów z błędem, zamiast zastępować go pustą bazą. Przy ręcznej edycji zatrzymaj serwer; zachowaj kopię JSON oraz dane świata.
 
-Nametagi używają standardowych zespołów scoreboard o zarezerwowanych nazwach `bcc_*`. Członkostwo klanowe zajmuje slot zespołu gracza; poprzedni zespół jest zapamiętywany i przywracany przy wyjściu, jeżeli nadal istnieje. Mod nie wyłącza friendly fire ani kolizji i nie ujawnia niewidzialnych kolegów. Mody lub komendy, które niezależnie nadpisują zespoły/nazwy TAB, mogą wymagać integracji. Wspólne testy aktualizacji obejmują BongoUtils 1.6.2 i BongosTeleports 1.5.0 z GP3D 19.0.0.
+Nametagi używają standardowych zespołów scoreboard o zarezerwowanych nazwach `bcc_*`. Członkostwo klanowe zajmuje slot zespołu gracza; poprzedni zespół jest zapamiętywany i przywracany przy wyjściu, jeżeli nadal istnieje. Mod nie wyłącza friendly fire ani kolizji i nie ujawnia niewidzialnych kolegów. Mody lub komendy, które niezależnie nadpisują zespoły/nazwy TAB, mogą wymagać integracji. Wspólne testy aktualizacji obejmują BongoUtils 1.7.0 i BongosTeleports 1.6.0 z GP3D 19.0.0.
 
 ## Budowanie i testy
 
-Z JDK 25: `bash gradlew build` na Linuxie lub `gradlew.bat build` na Windowsie. Wynik: `build/libs/BongosCommunityClans-1.1.1.jar`; `-sources.jar` jest archiwum źródeł.
+Z JDK 25: `bash gradlew build` na Linuxie lub `gradlew.bat build` na Windowsie. Wynik: `build/libs/BongosCommunityClans-1.1.2.jar`; `-sources.jar` jest archiwum źródeł.
 
 Testy jednostkowe obejmują role, zapis, zaproszenia, Unicode, kolory, tłumaczenia i reguły GP3D. Testy protokołu obejmują również dialogi, prywatność, TAB/nametagi, działki i odtworzenie błędu startu z kolorowym tagiem. [Instrukcje i ograniczenia testów](docs/testing.md).
 
