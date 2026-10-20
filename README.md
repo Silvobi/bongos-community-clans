@@ -97,7 +97,7 @@ Quickchat jest ustawieniem gracza, zapisywanym między sesjami. Po włączeniu `
 
 Gracz może należeć do jednego klanu i mieć jedno aktywne zaproszenie. Zaproszenie wygasa po 5 minutach, także podczas wyłączenia serwera. Utrata uprawnień lub odejście zapraszającego unieważnia jego zaproszenia. Ustawienie ignorowania zaproszeń jest trwałe.
 
-Komunikaty, okno usunięcia i GUI są renderowane przez serwer w języku danego klienta: `pl_*` → polski, pozostałe → angielski. Zmiana języka w ustawieniach klienta dotyczy kolejnych komunikatów i ponownie otwartego GUI. Teksty użytkowników i nazwy klanów nie są tłumaczone.
+Komunikaty, okno usunięcia i GUI są renderowane przez serwer w języku danego klienta: `pl_*` → polski, pozostałe → angielski. Zmiana języka w ustawieniach klienta dotyczy kolejnych komunikatów i ponownie otwartego GUI. Teksty użytkowników i nazwy klanów nie są tłumaczone. Konsola/RCON otrzymują angielski komunikat, gdy komenda wymaga gracza.
 
 ## Okna i zapis
 
