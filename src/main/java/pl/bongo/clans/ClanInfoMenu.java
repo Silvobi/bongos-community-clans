@@ -33,11 +33,13 @@ public final class ClanInfoMenu extends ChestMenu {
         this.runtime=runtime; this.clanId=clan.id; this.page=page; this.pages=pages;
         var container=getContainer();
         String date=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneOffset.UTC).format(Instant.ofEpochMilli(clan.createdAt));
-        container.setItem(4,item(Items.NAME_TAG,Lang.text(viewer,"info_name",clan.name),
-                List.of(Lang.text(viewer,"info_name",clan.name),Lang.text(viewer,"info_tag",clan.tag),Lang.text(viewer,"info_date",date),
-                        Lang.text(viewer,"info_founder",clan.founder().name),Lang.text(viewer,"info_members",clan.members.size()),
-                        Lang.text(viewer,"info_color",String.format("#%06X",clan.color)))));
+        container.setItem(4,item(Items.NAME_TAG,Lang.text(viewer,"info_name",clan.name),List.of()));
         container.getItem(4).set(DataComponents.CUSTOM_NAME,CommunityClans.prefix(clan));
+        container.getItem(4).set(DataComponents.LORE,new ItemLore(List.of(
+                Lang.component(viewer,"info_name",clan.name),Lang.component(viewer,"info_tag",CommunityClans.bracketedTag(clan)),
+                Lang.component(viewer,"info_date",date),Lang.component(viewer,"info_founder",clan.founder().name),
+                Lang.component(viewer,"info_members",clan.members.size())).stream()
+                .<Component>map(c -> c.copy().withStyle(ChatFormatting.GRAY)).toList()));
         if(pl.bongo.clans.claims.ClanClaims.gp!=null) {
             var stats=pl.bongo.clans.claims.ClaimLeaderboard.current(runtime).get(clan.id);
             var lore=new ArrayList<Component>(container.getItem(4).get(DataComponents.LORE).lines());
