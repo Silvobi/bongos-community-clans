@@ -1,24 +1,15 @@
-# Bongo's Community Clans — 1.1.1
+# Bongo's Community Clans 1.1.1
 
-
-## Autorstwo AI / AI disclosure
-
-Kod tego moda został napisany przez AI — OpenAI Codex — na podstawie wymagań i wskazówek Bongo.
-
-This mod's code was written by AI — OpenAI Codex — based on Bongo's requirements and guidance.
-
-**Prosty plugin na klany bez tej "toksycznej" części.**
-
-Mod serwerowy Fabric dla **Minecraft Java 26.3**. Działa z klientem vanilla; gracze nie instalują tego moda. Nie dodaje terenów, wojen, ekonomii ani systemu walk klanowych.
+Serwerowy mod Fabric dla **Minecraft Java 26.3**: klany z rangami, kolorowymi tagami, prywatnym czatem, GUI oraz opcjonalnym współdzieleniem działek i rankingiem GP3D. Klient vanilla nie potrzebuje dodatkowego moda.
 
 ## Wymagania i instalacja
 
-- Minecraft Java 26.3, Java 25, Fabric Loader 0.19.5 lub nowszy zgodny z 26.3.
-- Fabric API 0.161.0+26.3.
-- Umieść `BongosCommunityClans-1.1.1.jar` w `mods/`, usuń poprzedni JAR tego moda i uruchom ponownie serwer. Zwykłe `/reload` nie ładuje modów.
-- Na wskazanym serwerze testowym Fabric API jest już zainstalowane.
+- **Java 25**, Fabric Loader **0.19.5+**, Fabric API **0.161.0+26.3**.
+- Opcjonalnie: **GriefPrevention3D 19.0.0** (uniwersalny JAR) i [BongoUtils 1.6.2](https://github.com/Silvobi/bongo-utils) do panelu flag.
 
-Paczka jest budowana z przetworzonych zasobów przez `tools/build-cat-pack.py`; nie używa animowanej tekstury z globalną fazą. Każda klatka ma osobny model wybierany przez serwer.
+Zatrzymaj serwer, wykonaj kopię świata, usuń poprzedni JAR klanów i umieść `BongosCommunityClans-1.1.1.jar` w `mods/`. Zachowaj `<świat>/bongo-community-clans.json` i `.bak`. Uruchom ponownie serwer; `/reload` nie podmienia modów.
+
+**Aktualizacja po błędzie `bad_tag` z 1.1.0:** ta wersja łączy kolorowe tagi z GP3D. Limit 12 znaków dotyczy widocznego tagu, pomijając poprawne kody kolorów. Długi zapis gradientu nie blokuje startu. Nie skracaj tagów ani nie kasuj bazy klanów; wystarczy wymiana JAR-a. Walidacja uszkodzonych danych pozostaje aktywna.
 
 ## Pierwszy klan
 
@@ -50,13 +41,14 @@ Zaproszony gracz wpisuje `/clan accept`. Przed nickiem pojawi się `[MasloTeamX]
 | `/clan chat <message>` | Wysyła wiadomość do osób online w klanie |
 | `/clan quickchat` | Włącza/wyłącza wysyłanie wiadomości `#...` do klanu |
 | `/clan info [page]` | Otwiera GUI skrzyni z informacjami i członkami |
+| `/clan top [area\|claims] [page]` | Ranking powierzchni lub liczby działek GP3D; domyślnie powierzchnia |
 | `/clan delete` | Otwiera okno usunięcia; zatwierdzenie dostępne po 10 sekundach |
 
 Komendy zarządzające pojawiają się w podpowiedziach tylko dla uprawnionych osób. Nie wymagają OP. Uprawnienia są również sprawdzane przez serwer przy wykonaniu.
 
 ## Rangi
 
-| Ranga | Zaprasza i usuwa niższe rangi | Zmienia nazwę, tag, kolor | Awansuje | Usuwa klan |
+| Ranga | Zaprasza i usuwa niższe rangi | Zmienia nazwę i tag z kolorami | Awansuje | Usuwa klan |
 |---|---|---|---|---|
 | `founder` — Założyciel | Tak | Tak | Do współzałożyciela lub zarządcy | Tak |
 | `cofounder` — Współzałożyciel | Tak | Tak | Do zarządcy | Nie |
@@ -64,6 +56,28 @@ Komendy zarządzające pojawiają się w podpowiedziach tylko dla uprawnionych o
 | `member` — Członek | Nie | Nie | Nie | Nie |
 
 Obsługiwane są też polskie nazwy rang: `założyciel`, `współzałożyciel`, `zarządca`, `członek`, oraz ich wersje bez znaków diakrytycznych. Nie można usuwać, awansować ani degradować siebie lub osoby o równej/wyższej randze. Do zmiany założyciela służy wyłącznie `transfer`. Założyciel przed wyjściem przekazuje tę rangę albo usuwa klan.
+
+## Działki i ranking GP3D
+
+Opcjonalna integracja z uniwersalnym **GriefPrevention3D 19.0.0**, Fabric **26.3**. Domyślnie aktualni członkowie tego samego klanu uzyskują na swoich własnych claimach dodatkowy **Build Trust**: budowanie, niszczenie, skrzynie oraz podstawowy dostęp. Dotyczy także działek członków offline i nowych claimów. Nie trzeba wzajemnie dopisywać nowych członków do list trustów.
+
+Dodatkowe prawo jest sprawdzane przez silnik GP3D przy każdej operacji. Dołączenie daje je od razu; wyjście, wyrzucenie lub usunięcie klanu od razu je odbiera. Mod nie modyfikuje natywnych list trustów. Ręcznie nadane prawa pozostają niezależne od członkostwa. Założyciel klanu nie otrzymuje Manage Trust, prawa usunięcia/przejęcia działki ani zmiany właściciela. Jawne odmowy GP3D oraz działki i poddziałki administracyjne nie są omijane.
+
+Ograniczone i zagnieżdżone poddziałki nie otrzymują domyślnie tego dodatkowego prawa. Z **BongoUtils 1.6.2** właściciel lub osoba z Manage Trust może użyć `/manageclaim` i ustawić w nich lokalną flagę **Dostęp członków klanu**. W zwykłych poddziałkach lokalne `off` również działa niezależnie od dostępu w działce nadrzędnej. Dostępne poziomy: `off`, `access`, `container`, `build`.
+
+`/manageclaim global` ustawia domyślny poziom na działkach właściciela; lokalne wyjątki mają pierwszeństwo dla każdej flagi osobno. Domyślny poziom to `build`. Bez BongoUtils integracja klanowa nadal działa z domyślnym Build Trust, z zachowaniem odmów i ograniczeń poddziałek. **BongosTeleports 1.5.0** rozpoznaje ten sam dodatkowy trust dla TPA, padów i ich zarządzania (z zachowaniem dotychczasowej własności pada).
+
+### Ranking działek
+
+- `/clan top` lub `/clan top area [page]` — ranking powierzchni w **m²**.
+- `/clan top claims [page]` — ranking liczby głównych działek.
+- `/clan info` — liczba działek, suma m² i podział metrażu na wymiary w lore informacji o klanie.
+
+Rankingi pokazują po 10 klanów na stronę. Liczą własne główne claimy wszystkich **aktualnych** członków, także offline. Poddziałki i claimy administracyjne nie dodają punktów. Metraż dotyczy X/Z; nieregularne claimy używają rzeczywistej powierzchni GP3D, a prostokąty szerokości i długości z wliczonymi skrajnymi blokami. Działka 10 × 10 bloków daje 100 m². Wymiary sumują się bez przelicznika Netheru. Ranking jest obliczany z bieżących claimów i członkostwa; przeniesienie własności, opuszczenie klanu czy zmiana rozmiaru wpływa na kolejne wyświetlenie. Suma używa 64-bitowych liczb. Przy remisie rozstrzyga drugi wynik, nazwa i identyfikator klanu.
+
+Ranking nie przejmuje własności terenu, nie dodaje wojen ani nagród. Bez GP3D wyświetla komunikat o wymaganej integracji; pozostałe funkcje klanów działają normalnie.
+
+Testy jednostkowe obejmują poziomy trustu, brak uprawnień zarządzania, sumowanie claimów offline, pomijanie poddziałek i adminów, rozdzielenie wymiarów oraz wartości powyżej 32 bitów. Wspólny test serwerowy w projekcie Teleports sprawdza rzeczywiste stawianie bloków, otwieranie skrzyń, wyrzucenie członka, ręczne trusty, odmowy i poddziałki 3D z lokalnym wyjątkiem, ranking oraz restart.
 
 ## Nazwy, Unicode i kolory
 
@@ -91,55 +105,20 @@ Okno usunięcia odlicza 10 rzeczywistych sekund i pozwala anulować. Potwierdzen
 
 Dane znajdują się w `<katalog świata>/bongo-community-clans.json`. Każda zmiana zapisuje zweryfikowaną kopię przez plik tymczasowy i zachowuje poprzednią wersję w `.bak`. Błąd zapisu nie zatwierdza zmiany w pamięci. Uszkodzony plik zatrzymuje uruchamianie obsługi klanów z błędem, zamiast zastępować go pustą bazą. Przy ręcznej edycji zatrzymaj serwer; zachowaj kopię JSON oraz dane świata.
 
-Nametagi używają standardowych zespołów scoreboard o zarezerwowanych nazwach `bcc_*`. Członkostwo klanowe zajmuje slot zespołu gracza; poprzedni zespół jest zapamiętywany i przywracany przy wyjściu, jeżeli nadal istnieje. Mod nie wyłącza friendly fire ani kolizji i nie ujawnia niewidzialnych kolegów. Mody lub komendy, które niezależnie nadpisują zespoły/nazwy TAB, mogą wymagać integracji. Testowano pakiet modów z tego serwera, w tym BongoUtils 1.3.0 i NoChatReports 26.3-v2.21.0.
+Nametagi używają standardowych zespołów scoreboard o zarezerwowanych nazwach `bcc_*`. Członkostwo klanowe zajmuje slot zespołu gracza; poprzedni zespół jest zapamiętywany i przywracany przy wyjściu, jeżeli nadal istnieje. Mod nie wyłącza friendly fire ani kolizji i nie ujawnia niewidzialnych kolegów. Mody lub komendy, które niezależnie nadpisują zespoły/nazwy TAB, mogą wymagać integracji. Wspólne testy aktualizacji obejmują BongoUtils 1.6.2 i BongosTeleports 1.5.0 z GP3D 19.0.0.
 
 ## Budowanie i testy
 
-Zainstaluj JDK 25, ustaw `JAVA_HOME`, a następnie:
+Z JDK 25: `bash gradlew build` na Linuxie lub `gradlew.bat build` na Windowsie. Wynik: `build/libs/BongosCommunityClans-1.1.1.jar`; `-sources.jar` jest archiwum źródeł.
 
-```text
-gradlew.bat build
-```
+Testy jednostkowe obejmują role, zapis, zaproszenia, Unicode, kolory, tłumaczenia i reguły GP3D. Testy protokołu obejmują również dialogi, prywatność, TAB/nametagi, działki i odtworzenie błędu startu z kolorowym tagiem. [Instrukcje i ograniczenia testów](docs/testing.md).
 
-Gotowy mod znajduje się w `build/libs/BongosCommunityClans-1.1.1.jar`. Wrapper i zweryfikowany build korzystają z Gradle 9.6.0. Loom: 1.17.12. Źródła i testy znajdują się w tej paczce.
+## Dodatkowy efekt
 
-Testy JUnit obejmują role/hierarchię, zaproszenia i ich unieważnianie, przekazanie założyciela, zapis/restart, awarie zapisu, uszkodzone dane, Unicode, kolory i kompletność tłumaczeń. Testy protokołu uruchamia się wyłącznie na osobnym serwerze offline dostępnym lokalnie (domyślnie port 25581):
+Kod zawiera również opcjonalny efekt `/clan cat`, wymagający pobrania paczki zasobów. [Konfiguracja paczki i zachowanie efektu](docs/optional-effects.md).
 
-```text
-gradlew.bat integrationTest -PtestPort=25581
-```
+## Autorstwo AI / AI disclosure
 
-Harness używa trzech klientów protokołu vanilla i nie wymaga OP. Sprawdza tagi w pakietach czatu/TAB/nametagów, prywatność czatu, GUI i próby wyciągania przedmiotów, polski/angielski, odliczanie, anulowanie, wcześniejsze zatwierdzenie i replay tokenu. Nie jest to test wizualny renderowania czcionek przez klienta Minecrafta.
+Kod tego moda został napisany przez AI — OpenAI Codex — na podstawie wymagań i wskazówek Bongo.
 
-Referencje wersji: [Fabric dla Minecraft 26.3](https://www.fabricmc.net/2026/09/15/263.html), [oficjalny przykład Fabric 26.3](https://github.com/FabricMC/fabric-example-mod/tree/26.3).
-
-## Wspólne działki i ranking GP3D — 1.1.0
-
-Opcjonalna integracja z uniwersalnym **GriefPrevention3D 19.0.0**, Fabric **26.3**. Domyślnie aktualni członkowie tego samego klanu uzyskują na swoich własnych claimach dodatkowy **Build Trust**: budowanie, niszczenie, skrzynie oraz podstawowy dostęp. Dotyczy także działek członków offline i nowych claimów. Nie trzeba wzajemnie dopisywać nowych członków do list trustów.
-
-Dodatkowe prawo jest sprawdzane przez silnik GP3D przy każdej operacji. Dołączenie daje je od razu; wyjście, wyrzucenie lub usunięcie klanu od razu je odbiera. Mod nie modyfikuje natywnych list trustów. Ręcznie nadane prawa pozostają niezależne od członkostwa. Założyciel klanu nie otrzymuje Manage Trust, prawa usunięcia/przejęcia działki ani zmiany właściciela. Jawne odmowy GP3D oraz działki i poddziałki administracyjne nie są omijane.
-
-Ograniczone i zagnieżdżone poddziałki nie otrzymują domyślnie tego dodatkowego prawa. Z **BongoUtils 1.4.0** właściciel lub osoba z Manage Trust może użyć `/manageclaim` i ustawić w nich lokalną flagę **Dostęp członków klanu**. W zwykłych poddziałkach lokalne `off` również działa niezależnie od dostępu w działce nadrzędnej. Dostępne poziomy: `off`, `access`, `container`, `build`.
-
-`/manageclaim global` ustawia domyślny poziom na działkach właściciela; lokalne wyjątki mają pierwszeństwo dla każdej flagi osobno. Domyślny poziom to `build`. Bez BongoUtils integracja klanowa nadal działa z domyślnym Build Trust, z zachowaniem odmów i ograniczeń poddziałek. **BongosTeleports 1.5.0** rozpoznaje ten sam dodatkowy trust dla TPA, padów i ich zarządzania (z zachowaniem dotychczasowej własności pada).
-
-### Ranking działek
-
-- `/clan top` lub `/clan top area [page]` — ranking powierzchni w **m²**.
-- `/clan top claims [page]` — ranking liczby głównych działek.
-- `/clan info` — liczba działek, suma m² i podział metrażu na wymiary w lore informacji o klanie.
-
-Rankingi pokazują po 10 klanów na stronę. Liczą własne główne claimy wszystkich **aktualnych** członków, także offline. Poddziałki i claimy administracyjne nie dodają punktów. Metraż dotyczy X/Z; nieregularne claimy używają rzeczywistej powierzchni GP3D, a prostokąty szerokości i długości z wliczonymi skrajnymi blokami. Działka 10 × 10 bloków daje 100 m². Wymiary sumują się bez przelicznika Netheru. Ranking jest obliczany z bieżących claimów i członkostwa; przeniesienie własności, opuszczenie klanu czy zmiana rozmiaru wpływa na kolejne wyświetlenie. Suma używa 64-bitowych liczb. Przy remisie rozstrzyga drugi wynik, nazwa i identyfikator klanu.
-
-Ranking nie przejmuje własności terenu, nie dodaje wojen ani nagród. Bez GP3D wyświetla komunikat o wymaganej integracji; pozostałe funkcje klanów działają normalnie.
-
-Testy jednostkowe obejmują poziomy trustu, brak uprawnień zarządzania, sumowanie claimów offline, pomijanie poddziałek i adminów, rozdzielenie wymiarów oraz wartości powyżej 32 bitów. Wspólny test serwerowy w projekcie Teleports sprawdza rzeczywiste stawianie bloków, otwieranie skrzyń, wyrzucenie członka, ręczne trusty, odmowy i poddziałki 3D z lokalnym wyjątkiem, ranking oraz restart.
-
-
-## Zgodność zapisanych kolorowych tagów — 1.1.1
-
-Ta wersja łączy obsługę kolorów Minecraft/HEX i ciemnoszarych nawiasów z integracją GP3D oraz rankingiem działek. Wersja 1.1.0 mogła zatrzymać start błędem `bad_tag` przy wczytywaniu tagu z kodami kolorów, ponieważ liczyła wszystkie znaki zapisu zamiast widocznego tekstu. Przykładowo gradient tagu ROBOTAIM ma 72 znaki zapisu, ale 8 widocznych liter.
-
-Limit 12 punktów kodowych dotyczy widocznego tekstu po usunięciu obsługiwanych kodów `&0`–`&f` oraz `&#RRGGBB`. Zapisane tagi, kolory, identyfikatory klanów, członkostwa, preferencje i zaproszenia zachowują dotychczasowy format. Odczyt nie przepisuje pliku i nie skraca tagów. Nadal odrzucane są puste tagi, nadmiar widocznych znaków oraz znaki sterujące. Uszkodzony zapis nie jest zastępowany pustą bazą.
-
-Po zatrzymaniu serwera podmień **wyłącznie JAR Clans** na `BongosCommunityClans-1.1.1.jar` i uruchom ponownie. Zachowaj `world/bongo-community-clans.json` i `.bak` bez zmian. Nie jest wymagane usuwanie danych ani klanów. BongoUtils 1.6.2 i Teleports 1.5.0 zachowują wcześniejsze integracje.
+This mod's code was written by AI — OpenAI Codex — based on Bongo's requirements and guidance.
