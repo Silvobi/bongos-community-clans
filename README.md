@@ -1,4 +1,4 @@
-# Bongo's Community Clans — 1.0.3
+# Bongo's Community Clans — 1.1.0
 
 
 ## Autorstwo AI / AI disclosure
@@ -15,7 +15,7 @@ Mod serwerowy Fabric dla **Minecraft Java 26.3**. Działa z klientem vanilla; gr
 
 - Minecraft Java 26.3, Java 25, Fabric Loader 0.19.5 lub nowszy zgodny z 26.3.
 - Fabric API 0.161.0+26.3.
-- Umieść `BongosCommunityClans-1.0.3.jar` w `mods/`, usuń poprzedni JAR tego moda i uruchom ponownie serwer. Zwykłe `/reload` nie ładuje modów.
+- Umieść `BongosCommunityClans-1.1.0.jar` w `mods/`, usuń poprzedni JAR tego moda i uruchom ponownie serwer. Zwykłe `/reload` nie ładuje modów.
 - Na wskazanym serwerze testowym Fabric API jest już zainstalowane.
 
 Paczka jest budowana z przetworzonych zasobów przez `tools/build-cat-pack.py`; nie używa animowanej tekstury z globalną fazą. Każda klatka ma osobny model wybierany przez serwer.
@@ -101,7 +101,7 @@ Zainstaluj JDK 25, ustaw `JAVA_HOME`, a następnie:
 gradlew.bat build
 ```
 
-Gotowy mod znajduje się w `build/libs/BongosCommunityClans-1.0.0.jar`. Wrapper i zweryfikowany build korzystają z Gradle 9.6.0. Loom: 1.17.12. Źródła i testy znajdują się w tej paczce.
+Gotowy mod znajduje się w `build/libs/BongosCommunityClans-1.1.0.jar`. Wrapper i zweryfikowany build korzystają z Gradle 9.6.0. Loom: 1.17.12. Źródła i testy znajdują się w tej paczce.
 
 Testy JUnit obejmują role/hierarchię, zaproszenia i ich unieważnianie, przekazanie założyciela, zapis/restart, awarie zapisu, uszkodzone dane, Unicode, kolory i kompletność tłumaczeń. Testy protokołu uruchamia się wyłącznie na osobnym serwerze offline dostępnym lokalnie (domyślnie port 25581):
 
@@ -112,3 +112,25 @@ gradlew.bat integrationTest -PtestPort=25581
 Harness używa trzech klientów protokołu vanilla i nie wymaga OP. Sprawdza tagi w pakietach czatu/TAB/nametagów, prywatność czatu, GUI i próby wyciągania przedmiotów, polski/angielski, odliczanie, anulowanie, wcześniejsze zatwierdzenie i replay tokenu. Nie jest to test wizualny renderowania czcionek przez klienta Minecrafta.
 
 Referencje wersji: [Fabric dla Minecraft 26.3](https://www.fabricmc.net/2026/09/15/263.html), [oficjalny przykład Fabric 26.3](https://github.com/FabricMC/fabric-example-mod/tree/26.3).
+
+## Wspólne działki i ranking GP3D — 1.1.0
+
+Opcjonalna integracja z uniwersalnym **GriefPrevention3D 19.0.0**, Fabric **26.3**. Domyślnie aktualni członkowie tego samego klanu uzyskują na swoich własnych claimach dodatkowy **Build Trust**: budowanie, niszczenie, skrzynie oraz podstawowy dostęp. Dotyczy także działek członków offline i nowych claimów. Nie trzeba wzajemnie dopisywać nowych członków do list trustów.
+
+Dodatkowe prawo jest sprawdzane przez silnik GP3D przy każdej operacji. Dołączenie daje je od razu; wyjście, wyrzucenie lub usunięcie klanu od razu je odbiera. Mod nie modyfikuje natywnych list trustów. Ręcznie nadane prawa pozostają niezależne od członkostwa. Założyciel klanu nie otrzymuje Manage Trust, prawa usunięcia/przejęcia działki ani zmiany właściciela. Jawne odmowy GP3D oraz działki i poddziałki administracyjne nie są omijane.
+
+Ograniczone i zagnieżdżone poddziałki nie otrzymują domyślnie tego dodatkowego prawa. Z **BongoUtils 1.4.0** właściciel lub osoba z Manage Trust może użyć `/manageclaim` i ustawić w nich lokalną flagę **Dostęp członków klanu**. W zwykłych poddziałkach lokalne `off` również działa niezależnie od dostępu w działce nadrzędnej. Dostępne poziomy: `off`, `access`, `container`, `build`.
+
+`/manageclaim global` ustawia domyślny poziom na działkach właściciela; lokalne wyjątki mają pierwszeństwo dla każdej flagi osobno. Domyślny poziom to `build`. Bez BongoUtils integracja klanowa nadal działa z domyślnym Build Trust, z zachowaniem odmów i ograniczeń poddziałek. **BongosTeleports 1.5.0** rozpoznaje ten sam dodatkowy trust dla TPA, padów i ich zarządzania (z zachowaniem dotychczasowej własności pada).
+
+### Ranking działek
+
+- `/clan top` lub `/clan top area [page]` — ranking powierzchni w **m²**.
+- `/clan top claims [page]` — ranking liczby głównych działek.
+- `/clan info` — liczba działek, suma m² i podział metrażu na wymiary w lore informacji o klanie.
+
+Rankingi pokazują po 10 klanów na stronę. Liczą własne główne claimy wszystkich **aktualnych** członków, także offline. Poddziałki i claimy administracyjne nie dodają punktów. Metraż dotyczy X/Z; nieregularne claimy używają rzeczywistej powierzchni GP3D, a prostokąty szerokości i długości z wliczonymi skrajnymi blokami. Działka 10 × 10 bloków daje 100 m². Wymiary sumują się bez przelicznika Netheru. Ranking jest obliczany z bieżących claimów i członkostwa; przeniesienie własności, opuszczenie klanu czy zmiana rozmiaru wpływa na kolejne wyświetlenie. Suma używa 64-bitowych liczb. Przy remisie rozstrzyga drugi wynik, nazwa i identyfikator klanu.
+
+Ranking nie przejmuje własności terenu, nie dodaje wojen ani nagród. Bez GP3D wyświetla komunikat o wymaganej integracji; pozostałe funkcje klanów działają normalnie.
+
+Testy jednostkowe obejmują poziomy trustu, brak uprawnień zarządzania, sumowanie claimów offline, pomijanie poddziałek i adminów, rozdzielenie wymiarów oraz wartości powyżej 32 bitów. Wspólny test serwerowy w projekcie Teleports sprawdza rzeczywiste stawianie bloków, otwieranie skrzyń, wyrzucenie członka, ręczne trusty, odmowy i poddziałki 3D z lokalnym wyjątkiem, ranking oraz restart.

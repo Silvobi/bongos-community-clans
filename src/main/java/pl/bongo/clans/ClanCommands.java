@@ -55,6 +55,11 @@ public final class ClanCommands {
     }
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var root = literal("clan").executes(c -> run(c, (r,p) -> help(r,p)));
+        var top=literal("top").executes(c->run(c,(r,p)->pl.bongo.clans.claims.ClaimLeaderboard.show(r,p,true,1)));
+        for(String sort:List.of("area","claims")) top.then(literal(sort)
+            .executes(c->run(c,(r,p)->pl.bongo.clans.claims.ClaimLeaderboard.show(r,p,sort.equals("area"),1)))
+            .then(argument("page",IntegerArgumentType.integer(1)).executes(c->run(c,(r,p)->pl.bongo.clans.claims.ClaimLeaderboard.show(r,p,sort.equals("area"),IntegerArgumentType.getInteger(c,"page"))))));
+        root.then(top);
         root.then(literal("cat").executes(c -> run(c, (r,p) -> r.cat.request(p))));
         root.then(literal("help").executes(c -> run(c, (r,p) -> help(r,p))));
         root.then(literal("create").then(argument("name_tag", StringArgumentType.greedyString())
@@ -114,6 +119,7 @@ public final class ClanCommands {
         dispatcher.register(root);
     }
     private static void help(ClanRuntime r, ServerPlayer p) {
+        p.sendSystemMessage(net.minecraft.network.chat.Component.literal("/clan top area|claims [page]"));
         for (String key : List.of("help_title","help_create","help_members","help_roles","help_change","help_chat","help_info","help_ranks")) r.tell(p,key);
     }
 }

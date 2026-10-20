@@ -38,6 +38,16 @@ public final class ClanInfoMenu extends ChestMenu {
                         Lang.text(viewer,"info_founder",clan.founder().name),Lang.text(viewer,"info_members",clan.members.size()),
                         Lang.text(viewer,"info_color",String.format("#%06X",clan.color)))));
         container.getItem(4).set(DataComponents.CUSTOM_NAME,CommunityClans.prefix(clan));
+        if(pl.bongo.clans.claims.ClanClaims.gp!=null) {
+            var stats=pl.bongo.clans.claims.ClaimLeaderboard.current(runtime).get(clan.id);
+            var lore=new ArrayList<Component>(container.getItem(4).get(DataComponents.LORE).lines());
+            boolean polish=viewer.clientInformation().language().startsWith("pl");
+            lore.add(Component.literal((polish?"Działki: ":"Claims: ")+stats.claims()).withStyle(ChatFormatting.GRAY));
+            lore.add(Component.literal((polish?"Powierzchnia: ":"Area: ")+stats.area()+" m²").withStyle(ChatFormatting.GRAY));
+            stats.worlds().entrySet().stream().sorted(java.util.Map.Entry.comparingByKey()).forEach(e->
+                lore.add(Component.literal(e.getKey()+": "+e.getValue()+" m²").withStyle(ChatFormatting.GRAY)));
+            container.getItem(4).set(DataComponents.LORE,new ItemLore(lore));
+        }
         List<Member> members=clan.members.values().stream().sorted(Comparator.<Member>comparingInt(m -> -m.role.power)
                 .thenComparing(m -> m.name.toLowerCase(Locale.ROOT))).toList();
         for (int i=page*36;i<Math.min(members.size(),(page+1)*36);i++) {

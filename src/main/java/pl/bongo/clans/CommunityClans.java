@@ -20,16 +20,18 @@ public final class CommunityClans implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(ID);
     public static volatile ClanRuntime runtime;
     @Override public void onInitialize() {
+        pl.bongo.clans.claims.ClanClaims.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) -> ClanCommands.register(dispatcher));
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             try {
                 runtime = new ClanRuntime(server, new ClanStore(server.getWorldPath(LevelResource.ROOT).resolve("bongo-community-clans.json")));
+                pl.bongo.clans.claims.ClanClaims.start();
                 runtime.syncDisplay();
                 LOGGER.info("Bongo's Community Clans: {} clans loaded", runtime.service.state().clans.size());
             } catch (IOException e) { throw new IllegalStateException("Cannot safely load clan data; original file preserved", e); }
         });
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> { if (runtime != null) runtime.cat.close(); });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> runtime = null);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> { runtime = null; pl.bongo.clans.claims.ClanClaims.stop(); });
         ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> {
             if (runtime != null) runtime.cat.configure(handler);
         });
