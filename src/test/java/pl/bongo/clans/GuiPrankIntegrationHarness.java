@@ -69,22 +69,22 @@ public final class GuiPrankIntegrationHarness {
         String suffix=Long.toString(System.currentTimeMillis(),36);
         try(var viewer=new IntegrationHarness.Bot("GP"+suffix,"pl_pl");var other=new IntegrationHarness.Bot("GO"+suffix,"en_us")) {
             viewer.command("clan create G"+suffix+" T"+suffix); viewer.message("Utworzono klan");
-            Screen normal=open(viewer); gesture(viewer,normal,9,ContainerInput.PICKUP);
+            Screen normal=open(viewer); gesture(viewer,normal,18,ContainerInput.PICKUP);
             none(viewer,"ordinary click and close does not trigger");
-            Screen empty=open(viewer); check(empty.items.items().get(45).isEmpty(),"fixture slot is empty");
-            gesture(viewer,empty,45,ContainerInput.QUICK_MOVE); none(viewer,"empty shift-click does not trigger");
-            Screen slow=open(viewer); click(viewer,slow,9,ContainerInput.QUICK_MOVE,slow.open.getContainerId());
+            Screen empty=open(viewer); check(empty.items.items().get(44).isEmpty(),"fixture slot is empty");
+            gesture(viewer,empty,44,ContainerInput.QUICK_MOVE); none(viewer,"empty shift-click does not trigger");
+            Screen slow=open(viewer); click(viewer,slow,18,ContainerInput.QUICK_MOVE,slow.open.getContainerId());
             responsiveWait(viewer,other,800); viewer.send(new ServerboundContainerClosePacket(slow.open.getContainerId()));
             none(viewer,"closing after 800 ms does not trigger");
             Screen interrupted=open(viewer);
-            click(viewer,interrupted,9,ContainerInput.QUICK_MOVE,interrupted.open.getContainerId());
+            click(viewer,interrupted,18,ContainerInput.QUICK_MOVE,interrupted.open.getContainerId());
             click(viewer,interrupted,4,ContainerInput.PICKUP,interrupted.open.getContainerId());
             viewer.send(new ServerboundContainerClosePacket(interrupted.open.getContainerId()));
             none(viewer,"an intervening ordinary click cancels the gesture");
-            Screen staleClick=open(viewer); click(viewer,staleClick,9,ContainerInput.QUICK_MOVE,staleClick.open.getContainerId()+1);
+            Screen staleClick=open(viewer); click(viewer,staleClick,18,ContainerInput.QUICK_MOVE,staleClick.open.getContainerId()+1);
             viewer.send(new ServerboundContainerClosePacket(staleClick.open.getContainerId()));
             none(viewer,"click for another window does not trigger");
-            Screen staleClose=open(viewer); click(viewer,staleClose,9,ContainerInput.QUICK_MOVE,staleClose.open.getContainerId());
+            Screen staleClose=open(viewer); click(viewer,staleClose,18,ContainerInput.QUICK_MOVE,staleClose.open.getContainerId());
             viewer.send(new ServerboundContainerClosePacket(staleClose.open.getContainerId()+1));
             none(viewer,"close for another window does not trigger");
             viewer.send(new ServerboundContainerClickPacket(0,0,(short)9,(byte)0,ContainerInput.QUICK_MOVE,new Int2ObjectOpenHashMap<>(),HashedStack.EMPTY));
@@ -93,22 +93,22 @@ public final class GuiPrankIntegrationHarness {
 
             Screen target=open(viewer);
             List<ItemStack> inventoryBefore=target.items.items().subList(54,90).stream().map(ItemStack::copy).toList();
-            gesture(viewer,target,9,ContainerInput.QUICK_MOVE);
+            gesture(viewer,target,18,ContainerInput.QUICK_MOVE);
             var spawn=(ClientboundAddEntityPacket)viewer.await(CatIntegrationHarness::catSpawn,5000);
             long first=System.nanoTime();
             viewer.await(p->p instanceof ClientboundSoundPacket s && s.getSound().value().location().getPath().equals("cat.clapping"),5000);
             check(true,"shift-click on a head and immediate close triggers cat and audio");
             Screen verify=open(viewer);
-            check(!verify.items.items().get(9).isEmpty(),"clan head remains owned by the GUI");
+            check(!verify.items.items().get(18).isEmpty(),"clan head remains owned by the GUI");
             var after=verify.items.items().subList(54,90);
             boolean same=true; for(int i=0;i<after.size();i++) same &= ItemStack.matches(inventoryBefore.get(i),after.get(i));
             check(same && verify.items.carriedItem().isEmpty(),"gesture and cat preserve authoritative survival inventory");
-            gesture(viewer,verify,9,ContainerInput.QUICK_MOVE);
+            gesture(viewer,verify,18,ContainerInput.QUICK_MOVE);
             viewer.drain(150);
             check(viewer.events.stream().filter(CatIntegrationHarness::catSpawn).findAny().isEmpty(),"repeated gesture cannot interrupt or stack an active cat");
             viewer.await(p->p instanceof ClientboundRemoveEntitiesPacket r && r.entityIds().contains(spawn.getId()),8000);
             viewer.events.clear();
-            Screen cooling=open(viewer); gesture(viewer,cooling,9,ContainerInput.QUICK_MOVE);
+            Screen cooling=open(viewer); gesture(viewer,cooling,18,ContainerInput.QUICK_MOVE);
             none(viewer,"cooldown suppresses another cat even after the first animation has ended");
             other.drain(100);
             check(other.events.stream().noneMatch(CatIntegrationHarness::catSpawn),"observer receives no automatic cat");
@@ -118,14 +118,14 @@ public final class GuiPrankIntegrationHarness {
             long remaining=30_250-(System.nanoTime()-first)/1_000_000;
             if(remaining>0)responsiveWait(viewer,other,remaining);
             viewer.events.clear();
-            Screen expired=open(viewer); gesture(viewer,expired,9,ContainerInput.QUICK_MOVE);
+            Screen expired=open(viewer); gesture(viewer,expired,18,ContainerInput.QUICK_MOVE);
             viewer.await(CatIntegrationHarness::catSpawn,5000);
             check(true,"another gesture works after the 30-second cooldown expires");
         }
         try(var noPack=new IntegrationHarness.Bot("GN"+suffix,"en_us",(bot,pack)->bot.send(new ServerboundResourcePackPacket(pack.id(),ServerboundResourcePackPacket.Action.DECLINED)))) {
             noPack.command("clan create N"+suffix+" N"+suffix); noPack.message("Created clan");
             Screen screen=open(noPack); noPack.events.clear(); int messages=noPack.messages.size();
-            gesture(noPack,screen,9,ContainerInput.QUICK_MOVE); none(noPack,"automatic gesture silently skips a client without the pack");
+            gesture(noPack,screen,18,ContainerInput.QUICK_MOVE); none(noPack,"automatic gesture silently skips a client without the pack");
             check(noPack.messages.size()==messages,"automatic gesture adds no chat message without the pack");
         }
         System.out.println("PASS: GUI prank integration complete");

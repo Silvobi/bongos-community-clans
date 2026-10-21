@@ -18,6 +18,13 @@ processResources {
     filesMatching('fabric.mod.json') { expand version: project.version }
 }
 test { useJUnitPlatform() }
+
+tasks.register('clanBrowserIntegrationTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'pl.bongo.clans.ClanBrowserIntegrationHarness'
+    args(project.findProperty('testPort') ?: '25581')
+}
 tasks.register('integrationTest', JavaExec) {
     dependsOn testClasses
     classpath = sourceSets.test.runtimeClasspath

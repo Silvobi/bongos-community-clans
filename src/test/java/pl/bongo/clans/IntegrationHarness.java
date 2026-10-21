@@ -76,14 +76,14 @@ public final class IntegrationHarness {
             peer.command("clan info"); var open=(ClientboundOpenScreenPacket)peer.await(p->p instanceof ClientboundOpenScreenPacket,5000);
             check(open.getType()==MenuType.GENERIC_9x6 && open.getTitle().getString().contains(clan),"info opens a vanilla chest GUI");
             var content=(ClientboundContainerSetContentPacket)peer.await(p->p instanceof ClientboundContainerSetContentPacket c && c.containerId()==open.getContainerId(),5000);
-            check(!content.items().get(4).isEmpty() && !content.items().get(9).isEmpty() && !content.items().get(10).isEmpty(),"GUI contains clan metadata and member heads");
-            check(content.items().get(4).get(DataComponents.LORE).lines().stream().anyMatch(c->c.getString().contains("Founder:")),"GUI uses the viewer's English locale");
-            check(content.items().get(4).get(DataComponents.LORE).lines().stream().anyMatch(c->c.getString().contains("Tag: ["+tag+"]")
-                    && hasColor(c,0x12AB34) && hasColor(c,0xAA0000)),"GUI lore displays the colored tag without raw codes");
+            check(!content.items().get(1).isEmpty() && !content.items().get(18).isEmpty() && !content.items().get(19).isEmpty(),"GUI contains clan metadata and member heads");
+            check(content.items().get(3).get(DataComponents.LORE).lines().stream().anyMatch(c->c.getString().contains("Founder:")),"GUI uses the viewer's English locale");
+            var tagLabel=content.items().get(1).get(DataComponents.CUSTOM_NAME);
+            check(tagLabel.getString().contains("Tag: ["+tag+"]") && hasColor(tagLabel,0x12AB34) && hasColor(tagLabel,0xAA0000),"GUI displays the colored tag without raw codes");
             for(ContainerInput input:List.of(ContainerInput.PICKUP,ContainerInput.QUICK_MOVE,ContainerInput.SWAP,ContainerInput.THROW,ContainerInput.CLONE,ContainerInput.QUICK_CRAFT,ContainerInput.PICKUP_ALL)) {
-                peer.send(new ServerboundContainerClickPacket(open.getContainerId(),content.stateId(),(short)9,(byte)0,input,new Int2ObjectOpenHashMap<>(),HashedStack.EMPTY));
+                peer.send(new ServerboundContainerClickPacket(open.getContainerId(),content.stateId(),(short)18,(byte)0,input,new Int2ObjectOpenHashMap<>(),HashedStack.EMPTY));
                 var unchanged=(ClientboundContainerSetContentPacket)peer.await(p->p instanceof ClientboundContainerSetContentPacket c && c.containerId()==open.getContainerId(),5000);
-                check(unchanged.carriedItem().isEmpty() && !unchanged.items().get(9).isEmpty(),"GUI blocks item extraction via "+input);
+                check(unchanged.carriedItem().isEmpty() && !unchanged.items().get(18).isEmpty(),"GUI blocks item extraction via "+input);
             }
             peer.send(new ServerboundContainerClosePacket(open.getContainerId()));
             owner.command("clan promote "+peer.name+" cofounder"); owner.message("Współzałożyciel"); peer.message("Cofounder");
@@ -137,11 +137,11 @@ public final class IntegrationHarness {
             check(true,"quickchat preference survives restart");
             owner.command("clan info"); var opened=(ClientboundOpenScreenPacket)owner.await(p->p instanceof ClientboundOpenScreenPacket,5000);
             var page1=(ClientboundContainerSetContentPacket)owner.await(p->p instanceof ClientboundContainerSetContentPacket c && c.containerId()==opened.getContainerId(),5000);
-            check(page1.items().get(49).get(DataComponents.CUSTOM_NAME).getString().equals("Strona 1 / 2"),"large clan is paginated in inventory GUI");
-            owner.send(new ServerboundContainerClickPacket(opened.getContainerId(),page1.stateId(),(short)53,(byte)0,ContainerInput.PICKUP,new Int2ObjectOpenHashMap<>(),HashedStack.EMPTY));
+            check(page1.items().get(49).get(DataComponents.LORE).lines().getFirst().getString().equals("Strona 1 / 2"),"large clan is paginated in inventory GUI");
+            owner.send(new ServerboundContainerClickPacket(opened.getContainerId(),page1.stateId(),(short)50,(byte)0,ContainerInput.PICKUP,new Int2ObjectOpenHashMap<>(),HashedStack.EMPTY));
             var next=(ClientboundOpenScreenPacket)owner.await(p->p instanceof ClientboundOpenScreenPacket s && s.getContainerId()!=opened.getContainerId(),5000);
             var page2=(ClientboundContainerSetContentPacket)owner.await(p->p instanceof ClientboundContainerSetContentPacket c && c.containerId()==next.getContainerId(),5000);
-            check(page2.items().get(49).get(DataComponents.CUSTOM_NAME).getString().equals("Strona 2 / 2") && !page2.items().get(9).isEmpty(),"next page contains remaining members");
+            check(page2.items().get(49).get(DataComponents.LORE).lines().getFirst().getString().equals("Strona 2 / 2") && !page2.items().get(18).isEmpty(),"next page contains remaining members");
             owner.send(new ServerboundContainerClosePacket(next.getContainerId()));
             owner.command("clan change tag &aRestart"); owner.message("Tag klanu"); owner.drain(100);
             check(owner.teams.values().stream().anyMatch(p->hasColor(p.playerPrefix(),0x55FF55)),"inline &a color code works unquoted after restart");
@@ -267,6 +267,7 @@ public final class IntegrationHarness {
                 } else if(type==GamePacketTypes.CLIENTBOUND_DISGUISED_CHAT) {
                     var p=ClientboundDisguisedChatPacket.STREAM_CODEC.decode(buffer);result=p.chatType().decorate(p.message());
                 } else if(type==GamePacketTypes.CLIENTBOUND_OPEN_SCREEN) result=ClientboundOpenScreenPacket.STREAM_CODEC.decode(buffer);
+                else if(type==GamePacketTypes.CLIENTBOUND_COMMAND_SUGGESTIONS) result=ClientboundCommandSuggestionsPacket.STREAM_CODEC.decode(buffer);
                 else if(type==GamePacketTypes.CLIENTBOUND_CONTAINER_SET_CONTENT) result=ClientboundContainerSetContentPacket.STREAM_CODEC.decode(buffer);
             } finally {buffer.release();}
             if(result!=null){events.add(result);if(result instanceof Component c)messages.add(c);}

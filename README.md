@@ -1,4 +1,4 @@
-# Bongo's Community Clans 1.1.2
+# Bongo's Community Clans 1.2.0
 
 Serwerowy mod Fabric dla **Minecraft Java 26.3**: klany z rangami, kolorowymi tagami, prywatnym czatem, GUI oraz opcjonalnym współdzieleniem działek i rankingiem GP3D. Klient vanilla nie potrzebuje dodatkowego moda.
 
@@ -7,11 +7,11 @@ Serwerowy mod Fabric dla **Minecraft Java 26.3**: klany z rangami, kolorowymi ta
 - **Java 25**, Fabric Loader **0.19.5+**, Fabric API **0.161.0+26.3**.
 - Opcjonalnie: **GriefPrevention3D 19.0.0** (uniwersalny JAR) i [BongoUtils 1.7.0](https://github.com/Silvobi/bongo-utils) do panelu flag.
 
-Zatrzymaj serwer, wykonaj kopię świata, usuń poprzedni JAR klanów i umieść `BongosCommunityClans-1.1.2.jar` w `mods/`. Zachowaj `<świat>/bongo-community-clans.json` i `.bak`. Uruchom ponownie serwer; `/reload` nie podmienia modów.
+Zatrzymaj serwer, wykonaj kopię świata, usuń poprzedni JAR klanów i umieść `BongosCommunityClans-1.2.0.jar` w `mods/`. Zachowaj `<świat>/bongo-community-clans.json` i `.bak`. Uruchom ponownie serwer; `/reload` nie podmienia modów.
 
 **Aktualizacja po błędzie `bad_tag` z 1.1.0:** ta wersja łączy kolorowe tagi z GP3D. Limit 12 znaków dotyczy widocznego tagu, pomijając poprawne kody kolorów. Długi zapis gradientu nie blokuje startu. Nie skracaj tagów ani nie kasuj bazy klanów; wystarczy wymiana JAR-a. Walidacja uszkodzonych danych pozostaje aktywna.
 
-Wersja 1.1.2 usuwa też przejście do „Oczekiwania na serwer” po kliknięciu nieaktywnego odliczania usunięcia klanu. Odliczanie pozostaje widoczne; zatwierdzenie i anulowanie nadal sprawdza serwer.
+Wersja 1.2.0 usuwa też przejście do „Oczekiwania na serwer” po kliknięciu nieaktywnego odliczania usunięcia klanu. Odliczanie pozostaje widoczne; zatwierdzenie i anulowanie nadal sprawdza serwer.
 
 ## Pierwszy klan
 
@@ -42,11 +42,14 @@ Zaproszony gracz wpisuje `/clan accept`. Przed nickiem pojawi się `[MasloTeamX]
 | `/clan change tag <tag>` | Zmienia tag i jego kolory, np. `&1Super&4Clan` lub `&#000000Super&#ff0000Clan` |
 | `/clan chat <message>` | Wysyła wiadomość do osób online w klanie |
 | `/clan quickchat` | Włącza/wyłącza wysyłanie wiadomości `#...` do klanu |
-| `/clan info [page]` | Otwiera GUI skrzyni z informacjami i członkami |
+| `/clan info [klan]` | Informacje o własnym lub wskazanym klanie; podpowiadanie nazw |
+| `/clans` | Lista klanów w dużej skrzyni, z sortowaniem i stronami |
 | `/clan top [area\|claims] [page]` | Ranking powierzchni lub liczby działek GP3D; domyślnie powierzchnia |
 | `/clan delete` | Otwiera okno usunięcia; zatwierdzenie dostępne po 10 sekundach |
 
 Komendy zarządzające pojawiają się w podpowiedziach tylko dla uprawnionych osób. Nie wymagają OP. Uprawnienia są również sprawdzane przez serwer przy wykonaniu.
+
+`/clans` jest dostępne także bez członkostwa. Sortowanie: najnowsze/najstarsze, A–Z/Z–A, najwięcej/najmniej członków oraz, z GP3D, największa/najmniejsza suma m². Każda opcja ma własną ikonę w górnym wierszu; wybrana świeci. Kliknięcie klanu otwiera jego informacje. Katalog mieści 27 klanów na stronie. `/clan info Żółwie` obsługuje bezpośrednio nazwy Unicode.
 
 ## Rangi
 
@@ -101,7 +104,7 @@ Komunikaty, okno usunięcia i GUI są renderowane przez serwer w języku danego 
 
 ## Okna i zapis
 
-GUI informacji pokazuje nazwę, kolorowy tag, datę utworzenia w UTC, założyciela i główki członków z rangą oraz statusem online/offline. Strona mieści 36 członków; na dole znajdują się strzałki stron i zamknięcie. Wszystkie metody przenoszenia/klonowania przedmiotów z GUI są zablokowane. Główki osób online korzystają z ich aktualnego profilu.
+GUI informacji ma czarne szyby jako wypełnienie. W górnym wierszu są: tag (nametag), data UTC i założyciel (zegar), liczba członków (miecz), a z GP3D liczba działek, suma m² oraz podział world/nether/the end i dodatkowe wymiary (spawner). Miecz ulepsza się dla 1–6 członków: drewno, miedź, żelazo, złoto, diament, netheryt; większe klany zachowują netheryt. Trzy wiersze mieszczą 27 główek z rangą i statusem online/offline. Na dole: powrót do `/clans`, kartki poprzedniej/następnej strony i bariera zamknięcia. Powrót zachowuje sortowanie i stronę katalogu. Bez GP3D spawner pozostaje wypełnieniem. Wszystkie metody przenoszenia/klonowania przedmiotów z GUI są zablokowane. Główki osób online korzystają z ich aktualnego profilu.
 
 Okno usunięcia odlicza 10 rzeczywistych sekund i pozwala anulować. Potwierdzenie ma losowy token przypisany do konkretnego gracza i klanu; wygasa po 90 sekundach. Serwer sprawdza czas, członkostwo i rangę, także przy ręcznie spreparowanym pakiecie. Rozłączenie usuwa oczekujące potwierdzenie. Niewykorzystane potwierdzenia nie przetrwają restartu.
 
@@ -111,7 +114,7 @@ Nametagi używają standardowych zespołów scoreboard o zarezerwowanych nazwach
 
 ## Budowanie i testy
 
-Z JDK 25: `bash gradlew build` na Linuxie lub `gradlew.bat build` na Windowsie. Wynik: `build/libs/BongosCommunityClans-1.1.2.jar`; `-sources.jar` jest archiwum źródeł.
+Z JDK 25: `bash gradlew build` na Linuxie lub `gradlew.bat build` na Windowsie. Wynik: `build/libs/BongosCommunityClans-1.2.0.jar`; `-sources.jar` jest archiwum źródeł.
 
 Testy jednostkowe obejmują role, zapis, zaproszenia, Unicode, kolory, tłumaczenia i reguły GP3D. Testy protokołu obejmują również dialogi, prywatność, TAB/nametagi, działki i odtworzenie błędu startu z kolorowym tagiem. [Instrukcje i ograniczenia testów](docs/testing.md).
 
