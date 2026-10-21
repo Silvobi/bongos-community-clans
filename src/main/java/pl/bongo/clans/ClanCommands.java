@@ -114,9 +114,17 @@ public final class ClanCommands {
                 }))));
         root.then(change);
         root.then(literal("info").executes(c -> run(c,(r,p) -> ClanInfoMenu.open(r,p,0)))
-                .then(argument("page",IntegerArgumentType.integer(1)).executes(c -> run(c,(r,p) -> ClanInfoMenu.open(r,p,IntegerArgumentType.getInteger(c,"page")-1)))));
+                .then(argument("clan",StringArgumentType.greedyString()).suggests((c,b) -> SharedSuggestionProvider.suggest(
+                        CommunityClans.runtime == null ? List.<String>of() : CommunityClans.runtime.service.state().clans.values().stream().map(clan -> clan.name).toList(),b))
+                        .executes(c -> run(c,(r,p) -> ClanInfoMenu.open(r,p,findClan(r,textArgument(str(c,"clan"))).id,0,null)))));
         root.then(literal("delete").requires(s -> hasPower(s,3)).executes(c -> run(c,(r,p) -> r.requestDelete(p))));
         dispatcher.register(root);
+        dispatcher.register(literal("clans").executes(c -> run(c,(r,p) ->
+                ClanBrowserMenu.open(r,p,new ClanBrowserMenu.Position(ClanBrowserMenu.Sort.NEWEST,0)))));
+    }
+    private static Clan findClan(ClanRuntime runtime,String name) {
+        return runtime.service.state().clans.values().stream().filter(c -> c.name.equalsIgnoreCase(name)).findFirst()
+                .orElseThrow(() -> new ClanException("clan_not_found"));
     }
     private static void help(ClanRuntime r, ServerPlayer p) {
         p.sendSystemMessage(net.minecraft.network.chat.Component.literal("/clan top area|claims [page]"));
