@@ -21,17 +21,24 @@ public final class CommunityClans implements ModInitializer {
     public static volatile ClanRuntime runtime;
     @Override public void onInitialize() {
         pl.bongo.clans.claims.ClanClaims.register();
+        pl.bongo.clans.claims.ClaimMenus.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) -> ClanCommands.register(dispatcher));
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             try {
                 runtime = new ClanRuntime(server, new ClanStore(server.getWorldPath(LevelResource.ROOT).resolve("bongo-community-clans.json")));
                 pl.bongo.clans.claims.ClanClaims.start();
+                if (pl.bongo.clans.claims.ClanClaims.gp != null && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("bongoutils"))
+                    pl.bongo.clans.claims.ClaimMenus.active = new pl.bongo.clans.claims.ClaimMenus(server, pl.bongo.clans.claims.ClanClaims.gp);
                 runtime.syncDisplay();
                 LOGGER.info("Bongo's Community Clans: {} clans loaded", runtime.service.state().clans.size());
             } catch (IOException e) { throw new IllegalStateException("Cannot safely load clan data; original file preserved", e); }
         });
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> { if (runtime != null) runtime.cat.close(); });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> { runtime = null; pl.bongo.clans.claims.ClanClaims.stop(); });
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            runtime = null; pl.bongo.clans.claims.ClanClaims.stop();
+            pl.bongo.clans.claims.ClaimMenus.active = null; pl.bongo.clans.claims.ClaimMenus.flagsUi = null;
+            pl.bongo.clans.claims.ClaimGlowIntegration.renderer = null;
+        });
         ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> {
             if (runtime != null) runtime.cat.configure(handler);
         });
@@ -54,10 +61,14 @@ public final class CommunityClans implements ModInitializer {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             if (runtime != null) {
                 runtime.forgetDialog(handler.player.getUUID());
+                if (pl.bongo.clans.claims.ClaimMenus.active != null) pl.bongo.clans.claims.ClaimMenus.active.forget(handler.player.getUUID());
                 runtime.cat.disconnected(handler);
             }
         });
-        ServerTickEvents.END_SERVER_TICK.register(server -> { if (runtime != null) runtime.tick(); });
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            if (runtime != null) runtime.tick();
+            if (pl.bongo.clans.claims.ClaimMenus.active != null) pl.bongo.clans.claims.ClaimMenus.active.tick();
+        });
         ServerMessageEvents.ALLOW_CHAT_MESSAGE.register((message, player, bound) -> {
             if (runtime == null) return true;
             var user = runtime.service.state().users.get(player.getUUID());

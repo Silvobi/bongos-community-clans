@@ -69,7 +69,7 @@ public final class IntegrationHarness {
             check(outsider.messages.stream().noneMatch(m->m.getString().contains("PRIVATE_COMMAND_")),"explicit clan chat is hidden from nonmembers");
             owner.command("clan quickchat"); owner.message("Quickchat włączony");
             owner.chat("#PRIVATE_QUICK_"+suffix); owner.message("PRIVATE_QUICK_"); peer.message("PRIVATE_QUICK_"); outsider.drain(100);
-            check(outsider.messages.stream().noneMatch(m->m.getString().contains("PRIVATE_QUICK_")),"#quickchat cannot leak to public chat with NoChatReports installed");
+            check(outsider.messages.stream().noneMatch(m->m.getString().contains("PRIVATE_QUICK_")),"#quickchat cannot leak to public chat");
             owner.chat("PUBLIC_"+suffix); Component publicChat=outsider.message("PUBLIC_");
             check(publicChat.getString().contains("["+tag+"] "+owner.name),"public chat includes the clan prefix");
             check(hasColor(publicChat,0x12AB34) && hasColor(publicChat,0xAA0000),"public chat keeps the mixed tag colors");
@@ -248,6 +248,7 @@ public final class IntegrationHarness {
                 else if(type==CommonPacketTypes.CLIENTBOUND_SHOW_DIALOG) result=ClientboundShowDialogPacket.STREAM_CODEC.decode(buffer);
                 else if(type==CommonPacketTypes.CLIENTBOUND_RESOURCE_PACK_PUSH) result=ClientboundResourcePackPushPacket.STREAM_CODEC.decode(buffer);
                 else if(type==GamePacketTypes.CLIENTBOUND_ADD_ENTITY) result=ClientboundAddEntityPacket.STREAM_CODEC.decode(buffer);
+                else if(type==GamePacketTypes.CLIENTBOUND_BLOCK_UPDATE) result=ClientboundBlockUpdatePacket.STREAM_CODEC.decode(buffer);
                 else if(type==GamePacketTypes.CLIENTBOUND_SET_ENTITY_DATA) result=ClientboundSetEntityDataPacket.STREAM_CODEC.decode(buffer);
                 else if(type==GamePacketTypes.CLIENTBOUND_REMOVE_ENTITIES) result=ClientboundRemoveEntitiesPacket.STREAM_CODEC.decode(buffer);
                 else if(type==GamePacketTypes.CLIENTBOUND_SOUND) result=ClientboundSoundPacket.STREAM_CODEC.decode(buffer);

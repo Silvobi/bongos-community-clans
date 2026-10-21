@@ -1,4 +1,4 @@
-# Bongo's Community Clans 1.2.0
+# Bongo's Community Clans 1.3.0
 
 Serwerowy mod Fabric dla **Minecraft Java 26.3**: klany z rangami, kolorowymi tagami, prywatnym czatem, GUI oraz opcjonalnym współdzieleniem działek i rankingiem GP3D. Klient vanilla nie potrzebuje dodatkowego moda.
 
@@ -7,7 +7,9 @@ Serwerowy mod Fabric dla **Minecraft Java 26.3**: klany z rangami, kolorowymi ta
 - **Java 25**, Fabric Loader **0.19.5+**, Fabric API **0.161.0+26.3**.
 - Opcjonalnie: **GriefPrevention3D 19.0.0** (uniwersalny JAR) i [BongoUtils 1.7.0](https://github.com/Silvobi/bongo-utils) do panelu flag.
 
-Zatrzymaj serwer, wykonaj kopię świata, usuń poprzedni JAR klanów i umieść `BongosCommunityClans-1.2.0.jar` w `mods/`. Zachowaj `<świat>/bongo-community-clans.json` i `.bak`. Uruchom ponownie serwer; `/reload` nie podmienia modów.
+Zatrzymaj serwer, wykonaj kopię świata, usuń poprzedni JAR klanów i umieść `BongosCommunityClans-1.3.0.jar` w `mods/`. Zachowaj `<świat>/bongo-community-clans.json` i `.bak`. Uruchom ponownie serwer; `/reload` nie podmienia modów.
+
+W 1.3.0: [menu działek `/manageclaim` i `/claims`, trusty, usuwanie, przekazywanie i glow bez ghost-blocków](docs/claims.md). Panel wymaga BongoUtils 1.7.0 i GP3D 19.0.0; zwykłe funkcje klanów nadal działają bez nich. [Audyt kompletności gałęzi](docs/branch-audit-1.3.0.md).
 
 **Aktualizacja po błędzie `bad_tag` z 1.1.0:** ta wersja łączy kolorowe tagi z GP3D. Limit 12 znaków dotyczy widocznego tagu, pomijając poprawne kody kolorów. Długi zapis gradientu nie blokuje startu. Nie skracaj tagów ani nie kasuj bazy klanów; wystarczy wymiana JAR-a. Walidacja uszkodzonych danych pozostaje aktywna.
 

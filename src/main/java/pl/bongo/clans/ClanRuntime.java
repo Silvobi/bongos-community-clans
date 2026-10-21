@@ -113,6 +113,7 @@ public final class ClanRuntime {
                 EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME), online));
     }
     public void requestDelete(ServerPlayer player) {
+        if (pl.bongo.clans.claims.ClaimMenus.active != null) pl.bongo.clans.claims.ClaimMenus.active.forget(player.getUUID());
         Clan c = service.require(player.getUUID());
         if (c.members.get(player.getUUID()).role != Role.FOUNDER) throw new ClanException("no_permission");
         DeleteRequest request = new DeleteRequest(c.id, UUID.randomUUID().toString(), System.nanoTime());

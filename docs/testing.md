@@ -10,7 +10,7 @@ Zainstaluj JDK 25, ustaw `JAVA_HOME`, a następnie:
 gradlew.bat build
 ```
 
-Gotowy mod znajduje się w `build/libs/BongosCommunityClans-1.2.0.jar`. Wrapper i zweryfikowany build korzystają z Gradle 9.6.0. Loom: 1.17.12. Źródła i testy znajdują się w tej paczce.
+Gotowy mod znajduje się w `build/libs/BongosCommunityClans-1.3.0.jar`. Wrapper i zweryfikowany build korzystają z Gradle 9.6.0. Loom: 1.17.12. Źródła i testy znajdują się w tej paczce. Scenariusze nowego menu działek i konfigurację fixture opisuje [menu działek](claims.md).
 
 Testy JUnit obejmują role/hierarchię, zaproszenia i ich unieważnianie, przekazanie założyciela, zapis/restart, awarie zapisu, uszkodzone dane, Unicode, kolory i kompletność tłumaczeń. Testy protokołu uruchamia się wyłącznie na osobnym serwerze offline dostępnym lokalnie (domyślnie port 25581):
 

@@ -13,7 +13,9 @@ public abstract class DialogClickMixin {
     @Inject(method = "handleCustomClickAction", at = @At("RETURN"))
     private void clans$click(ServerboundCustomClickActionPacket packet, CallbackInfo ci) {
         if (!packet.id().getNamespace().equals(CommunityClans.ID)) return;
-        if ((Object) this instanceof ServerGamePacketListenerImpl game && CommunityClans.runtime != null)
+        if ((Object) this instanceof ServerGamePacketListenerImpl game && CommunityClans.runtime != null) {
+            if (pl.bongo.clans.claims.ClaimMenus.active != null && pl.bongo.clans.claims.ClaimMenus.active.submit(game.player, packet)) return;
             CommunityClans.runtime.click(game.player, packet.id().getPath());
+        }
     }
 }

@@ -19,6 +19,13 @@ processResources {
 }
 test { useJUnitPlatform() }
 
+tasks.register('claimMenuIntegrationTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'pl.bongo.clans.ClaimMenuIntegrationHarness'
+    args(project.findProperty('testPort') ?: '25649', project.findProperty('rconPort') ?: '25650', project.findProperty('rconPassword') ?: 'claim-menu-fixture')
+}
+
 tasks.register('clanBrowserIntegrationTest', JavaExec) {
     dependsOn testClasses
     classpath = sourceSets.test.runtimeClasspath
